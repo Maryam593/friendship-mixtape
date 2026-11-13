@@ -291,3 +291,85 @@ html, body {
 .play-button:hover{
     transform: scale(1.1);
 }
+/* flower - poora phool ka dabba (position isi par) */
+.flower{
+    position: absolute;
+    top: 53%;
+    left: 400px;
+    width: 140px;
+    height: 140px;
+    z-index: 10;
+}
+/* peela gola - beech mein, pattiyon ke upar */
+.flowermain{
+    width: 60px;
+    height: 60px;
+    background-color: yellow;
+    border: 2px solid black;
+    box-sizing: border-box;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -30px;    /* aadha size wapas */
+    margin-left: -30px;
+    z-index: 2;
+}
+/* patti - sab pattiyon ki common style */
+.petal{
+    width: 20px;
+    height: 45px;
+    background-color: #fffbea;
+    border: 2px solid black;
+    box-sizing: border-box;
+    border-radius: 50%;     /* lamba anda */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -22px;      /* aadha size wapas */
+    margin-left: -10px;
+    z-index: 1;
+}
+/* har patti ka apna rukh */
+.petal-1{
+    transform: rotate(0deg) translateY(-40px);
+}
+.petal-2{
+    transform: rotate(30deg) translateY(-40px);
+}
+.petal-3{
+    transform: rotate(60deg) translateY(-40px);
+}
+.petal-4{
+    transform: rotate(90deg) translateY(-40px);
+}
+.petal-5{
+    transform: rotate(120deg) translateY(-40px);
+}
+.petal-6{
+    transform: rotate(150deg) translateY(-40px);
+}
+.petal-7{
+    transform: rotate(180deg) translateY(-40px);
+}
+.petal-8{
+    transform: rotate(210deg) translateY(-40px);
+}
+.petal-9{
+    transform: rotate(240deg) translateY(-40px);
+}
+.petal-10{
+    transform: rotate(270deg) translateY(-40px);
+}
+.petal-11{
+    transform: rotate(300deg) translateY(-40px);
+}
+.petal-12{
+    transform: rotate(330deg) translateY(-40px);
+}
+.petal-13{
+    transform: rotate(360px) translateY(-40px);
+}
+.petal-14{
+    transform: rotate(390deg) translateY(-40px);
+}
