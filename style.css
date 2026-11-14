@@ -367,9 +367,47 @@ html, body {
 .petal-12{
     transform: rotate(330deg) translateY(-40px);
 }
-.petal-13{
+/* .petal-13{
     transform: rotate(360px) translateY(-40px);
 }
 .petal-14{
     transform: rotate(390deg) translateY(-40px);
+} */
+.heart-bubble{
+    background-color: rgb(176, 57, 96);
+    width:110px;
+    height:110px;
+    border-radius:20px;
+    position: absolute;
+    top:10%;
+    left:1000px;
+    z-index: 10;
+    border-bottom: 3px solid black;   
+}
+.right-circle{
+    width: 50px;
+    height: 50px;
+    background-color: rgb(192, 187, 189);
+    border-radius: 50%;
+    position: absolute;
+    top:13px;
+    left:46px;
+}
+.left-circle{
+    width: 50px;
+    height: 50px;
+    background-color: rgb(192, 187, 189);
+    border-radius: 50%;
+    position: absolute;
+    top:15px;
+    left:14px;
+}
+.main-square{
+    width: 50px;
+    height: 50px;
+    background-color: rgb(192, 187, 189);
+    position: absolute;
+    top:30px;
+    left:29px;
+    transform: rotate(45deg);
 }
