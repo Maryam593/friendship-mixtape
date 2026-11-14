@@ -385,29 +385,29 @@ html, body {
     border-bottom: 3px solid black;   
 }
 .right-circle{
-    width: 50px;
-    height: 50px;
+    width: 52px;
+    height: 52px;
     background-color: rgb(192, 187, 189);
     border-radius: 50%;
     position: absolute;
-    top:13px;
-    left:46px;
+    top:18px;
+    left:42.5px;
 }
 .left-circle{
-    width: 50px;
-    height: 50px;
+    width: 52px;
+    height: 52px;
     background-color: rgb(192, 187, 189);
     border-radius: 50%;
     position: absolute;
-    top:15px;
-    left:14px;
+    top:17px;
+    left:12.5px;
 }
 .main-square{
     width: 50px;
     height: 50px;
     background-color: rgb(192, 187, 189);
     position: absolute;
-    top:30px;
+    top:35px;
     left:29px;
     transform: rotate(45deg);
 }
