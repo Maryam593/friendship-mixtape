@@ -584,3 +584,23 @@ html, body {
     font-size: 16px;
     letter-spacing: -3px;
 }
+
+/* ---------- gaane ke saath animation ---------- */
+/* phool ghoomta hai - magar sirf jab gaana chale (warna ruka rehta hai, wahin se) */
+@keyframes spin{
+    to{ transform: rotate(360deg); }
+}
+.flower{
+    animation: spin 8s linear infinite;
+    animation-play-state: paused;
+}
+.flower.spinning{
+    animation-play-state: running;
+}
+/* pixel dil har sur par thora uchhalta hai */
+@keyframes beat{
+    50%{ transform: translateY(-6px) scale(1.15); }
+}
+.pixel-heart.beat{
+    animation: beat 0.2s ease-out;
+}

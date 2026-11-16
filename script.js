@@ -162,14 +162,31 @@ function playNote(freq, time, duration, type, volume) {
 
 // ek step par har layer ka sur bajao
 function playStep(step, time) {
-    for (const layer of track.layers) {
-        if (step % layer.every !== 0) continue;   // bass har doosre step par
+    track.layers.forEach(function (layer, layerNumber) {
+        if (step % layer.every !== 0) return;     // bass har doosre step par
         const index = Math.floor(step / layer.every) % layer.notes.length;  // chhota naam dobara se (loop)
         const note = layer.notes[index];
-        if (note === null) continue;              // khamoshi
+        if (note === null) return;                // khamoshi
         playNote(toFreq(note), time, track.stepTime * layer.every * 0.9, layer.type, layer.volume);
-    }
+        if (layerNumber === 0) {
+            bounceHeart(step % pixelHearts.length, time);   // upar wali dhun ke har sur par ek dil uchhle
+        }
+    });
 }
+
+// pixel dil ko theek usi waqt uchhalo jab sur baje
+const pixelHearts = document.querySelectorAll('.pixel-heart');
+function bounceHeart(number, time) {
+    const wait = (time - audioCtx.currentTime) * 1000;   // sur kitne ms baad bajega
+    setTimeout(function () {
+        const heart = pixelHearts[number];
+        heart.classList.remove('beat');
+        void heart.offsetWidth;            // browser ko animation dobara shuru karne do
+        heart.classList.add('beat');
+    }, wait);
+}
+
+const flower = document.querySelector('.flower');
 
 // har 25ms dekho: agle 0.1 second mein jo sur aane hain unhein pehle se tay kar do
 // (setInterval akela theek waqt par nahi chalta, audio ki ghari bilkul theek chalti hai)
@@ -207,6 +224,7 @@ function play() {
     timerId = setInterval(scheduler, 25);
     playIcon.textContent = '❚❚';
     playButton.classList.add('is-playing');
+    flower.classList.add('spinning');
 }
 
 function pause() {
@@ -215,6 +233,7 @@ function pause() {
     audioCtx.suspend();    // ghari rok do - wapas chalao to wahin se
     playIcon.textContent = '▶';
     playButton.classList.remove('is-playing');
+    flower.classList.remove('spinning');
 }
 
 playButton.addEventListener('click', function () {
