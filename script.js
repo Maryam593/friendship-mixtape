@@ -42,9 +42,135 @@ nameStep.addEventListener('submit', function (event) {
     showMessage();
 });
 
-// screen 2 -> player
+// screen 2 -> player (aur gaana shuru!)
 listenButton.addEventListener('click', function () {
     intro.classList.add('hidden');
+    play();
 });
 
 fromInput.focus();
+
+// ---------- mixtape: naamon se dhun (Web Audio oscillator) ----------
+const playButton = document.querySelector('.play-button');
+const playIcon = playButton.querySelector('span');
+
+// pentatonic scale: sirf ye 5 sur (C D E G A) - kisi bhi tarteeb mein meethe lagte hain
+const SCALE = [0, 2, 4, 7, 9];
+const BASE_FREQ = 261.63;    // C4 - "Sa" ki frequency
+
+// naam -> suron ki list. har harf ka number -> ek sur. space = chup (null)
+function nameToNotes(name, octave) {
+    const notes = [];
+    for (const letter of name.toLowerCase()) {
+        if (letter.trim() === '') {
+            notes.push(null);                      // space = khamoshi
+            continue;
+        }
+        const code = letter.codePointAt(0);        // a = 97, b = 98 ... (Urdu harf bhi chalein ge)
+        const sur = SCALE[code % 5];               // 5 suron mein se ek
+        const upar = Math.floor(code / 5) % 2;     // kabhi kabhi ek octave upar
+        notes.push(sur + 12 * (octave + upar));
+    }
+    return notes;
+}
+
+// sur (semitones) -> frequency (Hz). har 12 semitone par frequency double
+function toFreq(semitones) {
+    return BASE_FREQ * Math.pow(2, semitones / 12);
+}
+
+// do layers: tumhara naam = upar wali dhun, dost ka naam = neeche wala bass
+function makeTrack() {
+    return {
+        layers: [
+            { notes: nameToNotes(fromName, 1), type: 'square', volume: 0.07, every: 1 },
+            { notes: nameToNotes(toName, -1), type: 'triangle', volume: 0.25, every: 2 },
+        ],
+        stepTime: 0.25,    // har step kitne second ka
+        length: 64,        // kitne steps ka gaana
+    };
+}
+
+let audioCtx = null;       // speaker ka switch
+let master = null;         // poore gaane ka volume knob
+let track = null;
+let isPlaying = false;
+let currentStep = 0;
+let nextStepTime = 0;      // agla step kis waqt bajna hai (audio ki ghari mein)
+let timerId = null;
+
+function setupAudio() {
+    if (audioCtx) return;  // pehle se bana hai to dobara nahi
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    master = audioCtx.createGain();
+    master.gain.value = 0.6;
+    master.connect(audioCtx.destination);
+}
+
+// ek sur bajao: oscillator (taar) -> gain (volume) -> master -> speaker
+function playNote(freq, time, duration, type, volume) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    // dheere se shuru aur dheere se band - warna "tik" ki awaaz aati hai
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.exponentialRampToValueAtTime(volume, time + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+    osc.connect(gain);
+    gain.connect(master);
+    osc.start(time);
+    osc.stop(time + duration + 0.05);
+}
+
+// ek step par har layer ka sur bajao
+function playStep(step, time) {
+    for (const layer of track.layers) {
+        if (step % layer.every !== 0) continue;   // bass har doosre step par
+        const index = Math.floor(step / layer.every) % layer.notes.length;  // chhota naam dobara se (loop)
+        const note = layer.notes[index];
+        if (note === null) continue;              // khamoshi
+        playNote(toFreq(note), time, track.stepTime * layer.every * 0.9, layer.type, layer.volume);
+    }
+}
+
+// har 25ms dekho: agle 0.1 second mein jo sur aane hain unhein pehle se tay kar do
+// (setInterval akela theek waqt par nahi chalta, audio ki ghari bilkul theek chalti hai)
+function scheduler() {
+    while (nextStepTime < audioCtx.currentTime + 0.1) {
+        playStep(currentStep, nextStepTime);
+        nextStepTime += track.stepTime;
+        currentStep++;
+        if (currentStep >= track.length) {
+            currentStep = 0;
+        }
+    }
+}
+
+function play() {
+    if (fromName === '' || toName === '') return;
+    setupAudio();
+    audioCtx.resume();
+    if (!track) track = makeTrack();
+    isPlaying = true;
+    nextStepTime = Math.max(nextStepTime, audioCtx.currentTime + 0.05);
+    timerId = setInterval(scheduler, 25);
+    playIcon.textContent = '❚❚';
+    playButton.classList.add('is-playing');
+}
+
+function pause() {
+    isPlaying = false;
+    clearInterval(timerId);
+    audioCtx.suspend();    // ghari rok do - wapas chalao to wahin se
+    playIcon.textContent = '▶';
+    playButton.classList.remove('is-playing');
+}
+
+playButton.addEventListener('click', function () {
+    if (isPlaying) {
+        pause();
+    } else {
+        play();
+    }
+});

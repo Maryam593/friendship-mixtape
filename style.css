@@ -578,3 +578,9 @@ html, body {
     text-overflow: ellipsis;          /* lamba naam ho to ... */
     max-width: 230px;
 }
+/* chalte gaane mein pause icon - triangle wala margin nahi chahiye */
+.play-button.is-playing > span{
+    margin-left: 0;
+    font-size: 16px;
+    letter-spacing: -3px;
+}
