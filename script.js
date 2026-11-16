@@ -6,110 +6,34 @@ function updateFill() {
 bar.addEventListener('input', updateFill);
 updateFill();
 
-// ---------- teen zabanein: English, اردو, Türkçe ----------
-// har likhai ki ek "chabi" (key) - har zaban mein uska tarjuma
+// ---------- saari likhai ek jagah ----------
+// JS jo likhai badalti hai, uski "chabi" (key) - badalni ho to bas yahan badlo
 const TEXT = {
-    en: {
-        makeTitle: 'make a mixtape 💿',
-        yourName: 'your name',
-        friendName: "your friend's name",
-        makeButton: 'make my mixtape',
-        needNames: 'write both names! 😄',
-        happyBirthday: 'Happy Birthday',
-        madeYou: 'made you a mixtape 💗',
-        pleaseListen: 'please listen',
-        listen: 'listen ▶',
-        copyLink: 'copy link to send 🔗',
-        copied: 'copied! now send it 💌',
-        copyManual: 'copy the link from the address bar ☝',
-        getCard: 'get your card 💿',
-        download: 'download video 🎬',
-        recording: 'recording... keep this tab open ⏺',
-        noVideo: 'this browser cannot make videos 😢',
-        cardHappy: 'happy birthday',
-        cardFrom: 'from {name}',
-        cardTap: 'tap the card to play ▶',
-        pickTrack: 'which track?',
-        track1: 'side a',
-        track2: 'side b',
-        track3: 'lullaby',
-    },
-    ur: {
-        makeTitle: 'مکس ٹیپ بنائیں 💿',
-        yourName: 'آپ کا نام',
-        friendName: 'آپ کے دوست کا نام',
-        makeButton: 'میری مکس ٹیپ بنائیں',
-        needNames: 'دونوں نام تو لکھیں! 😄',
-        happyBirthday: 'سالگرہ مبارک',
-        madeYou: 'نے آپ کے لیے مکس ٹیپ بنائی ہے 💗',
-        pleaseListen: 'ضرور سنیں',
-        listen: 'سنیں ▶',
-        copyLink: 'بھیجنے کے لیے لنک کاپی کریں 🔗',
-        copied: 'کاپی ہو گیا! اب بھیج دیں 💌',
-        copyManual: 'اوپر ایڈریس بار سے لنک کاپی کریں ☝',
-        getCard: 'اپنا کارڈ لیں 💿',
-        download: 'ویڈیو ڈاؤن لوڈ کریں 🎬',
-        recording: 'ریکارڈنگ جاری ہے... یہ ٹیب کھلا رکھیں ⏺',
-        noVideo: 'یہ براؤزر ویڈیو نہیں بنا سکتا 😢',
-        cardHappy: 'سالگرہ مبارک',
-        cardFrom: '{name}  کی طرف سے',   // do space - Nastaliq ka space bohat patla hai
-        cardTap: 'سننے کے لیے کارڈ پر ٹیپ کریں ▶',
-        pickTrack: 'کون سا ٹریک؟',
-        track1: 'سائیڈ اے',
-        track2: 'سائیڈ بی',
-        track3: 'لوری',
-    },
-    tr: {
-        makeTitle: 'bir mixtape yap 💿',
-        yourName: 'adın',
-        friendName: 'arkadaşının adı',
-        makeButton: "mixtape'imi yap",
-        needNames: 'iki ismi de yaz! 😄',
-        happyBirthday: 'İyi ki doğdun',
-        madeYou: 'sana bir mixtape hazırladı 💗',
-        pleaseListen: 'lütfen dinle',
-        listen: 'dinle ▶',
-        copyLink: 'göndermek için linki kopyala 🔗',
-        copied: 'kopyalandı! şimdi gönder 💌',
-        copyManual: 'linki adres çubuğundan kopyala ☝',
-        getCard: 'kartını al 💿',
-        download: 'videoyu indir 🎬',
-        recording: 'kaydediliyor... bu sekmeyi açık tut ⏺',
-        noVideo: 'bu tarayıcı video yapamıyor 😢',
-        cardHappy: 'iyi ki doğdun',
-        cardFrom: 'sevgilerle, {name}',
-        cardTap: 'dinlemek için karta dokun ▶',
-        pickTrack: 'hangi parça?',
-        track1: 'a yüzü',
-        track2: 'b yüzü',
-        track3: 'ninni',
-    },
+    needNames: 'write both names! 😄',
+    copied: 'copied! now send it 💌',
+    copyManual: 'copy the link from the address bar ☝',
+    download: 'download video 🎬',
+    recording: 'recording... keep this tab open ⏺',
+    noVideo: 'this browser cannot make videos 😢',
+    cardHappy: 'happy birthday',
+    cardFrom: 'from {name}',
+    cardTap: 'tap the card to play ▶',
+    track1: 'side a',
+    track2: 'side b',
+    track3: 'lullaby',
 };
 
-// shuru mein kaun si zaban? pehle link (?lang=), phir pichhli baar wali, phir browser ki
-function pickLanguage() {
-    const fromLink = new URLSearchParams(location.search).get('lang');
-    if (TEXT[fromLink]) return fromLink;
-    try {
-        const saved = localStorage.getItem('mixtape-lang');
-        if (TEXT[saved]) return saved;
-    } catch (error) { /* private window mein localStorage band ho sakta hai */ }
-    const browser = (navigator.language || 'en').slice(0, 2);
-    return TEXT[browser] ? browser : 'en';
-}
-let lang = pickLanguage();
-
-// t('listen') -> abhi wali zaban mein likhai. {name} ki jagah naam bhi daal sakte hain
+// t('listen') -> likhai. {name} ki jagah naam bhi daal sakte hain
 function t(key, name) {
-    return TEXT[lang][key].replace('{name}', name || '');
+    return TEXT[key].replace('{name}', name || '');
 }
 
-// chhote harf - Turkish mein "I" ka chhota "ı" hota hai, isliye zaban batani padti hai
+// chhote harf
 function lower(text) {
-    return text.toLocaleLowerCase(lang === 'tr' ? 'tr-TR' : undefined);
+    return text.toLowerCase();
 }
 
-// Urdu (Arabic script) ke harf hain?
+// naam Urdu (Arabic script) mein likha hai? (card par jure hue harf alag na hon)
 function isUrdu(text) {
     return /[؀-ۿ]/.test(text);
 }
@@ -154,7 +78,7 @@ nameStep.addEventListener('submit', function (event) {
 // ---------- share link: naam link mein (?from=...&to=...) ----------
 // dost ko ye link bhejo - wo kholegi to seedha birthday message aayega
 function saveNamesInLink() {
-    const params = new URLSearchParams({ from: fromName, to: toName, lang: lang });
+    const params = new URLSearchParams({ from: fromName, to: toName });
     try {
         history.replaceState(null, '', '?' + params.toString());   // page reload kiye baghair address badlo
     } catch (error) {
@@ -582,15 +506,12 @@ function getGrain(W, H) {
     return grainCanvas;
 }
 
-// card ka font - Urdu ho to Nastaliq (Latin harf khud doosre font se aa jate hain)
+// card ka font
 function cardFont(weight, size) {
-    const family = lang === 'ur'
-        ? '"Noto Nastaliq Urdu", system-ui, "Segoe UI", sans-serif'
-        : 'system-ui, "Segoe UI", sans-serif';
-    return (weight ? weight + ' ' : '') + size + 'px ' + family;
+    return (weight ? weight + ' ' : '') + size + 'px system-ui, "Segoe UI", sans-serif';
 }
 
-// likhai ka rukh: Urdu daayein se baayein (rtl), baqi baayein se daayein (ltr)
+// likhai ka rukh: Urdu naam daayein se baayein (rtl), baqi baayein se daayein (ltr)
 function drawText(c, text, x, y) {
     c.direction = isUrdu(text) ? 'rtl' : 'ltr';
     c.fillText(text, x, y);
@@ -875,12 +796,8 @@ function stopCard() {
     drawCard();
 }
 
-cardButton.addEventListener('click', async function () {
+cardButton.addEventListener('click', function () {
     if (fromName === '' || toName === '') return;
-    if (lang === 'ur') {
-        // Nastaliq font internet se aata hai - canvas par likhne se pehle uska intezar
-        try { await document.fonts.load('52px "Noto Nastaliq Urdu"', 'سالگرہ'); } catch (error) { /* koi baat nahi */ }
-    }
     chooseCardTrack(trackIndex);           // shuru mein wahi track jo player mein chal raha tha
     cardPopup.classList.remove('hidden');
 });
@@ -924,37 +841,3 @@ cardDownload.addEventListener('click', function () {
     }
     playCard(true);
 });
-
-// ---------- zaban lagao: har [data-i18n] wali cheez ki likhai badlo ----------
-function applyLanguage() {
-    document.documentElement.lang = lang;
-    document.documentElement.classList.toggle('lang-ur', lang === 'ur');
-    document.querySelectorAll('[data-i18n]').forEach(function (el) {
-        el.textContent = t(el.dataset.i18n);
-    });
-    // Urdu daayein se baayein - sirf likhai wale hisson mein (player waghera waise hi rahein)
-    document.querySelectorAll('.intro-body, .card-button').forEach(function (el) {
-        el.dir = lang === 'ur' ? 'rtl' : 'ltr';
-    });
-    copyLinkButton.textContent = t('copyLink');
-    if (!cardSession || !cardSession.recorder) cardDownload.textContent = t('download');
-    if (introError.textContent !== '') introError.textContent = t('needNames');
-    document.querySelectorAll('#lang-switch button').forEach(function (button) {
-        button.classList.toggle('active', button.dataset.lang === lang);
-    });
-    if (fromName !== '' && toName !== '') saveNamesInLink();    // link mein bhi nayi zaban
-    if (!cardPopup.classList.contains('hidden') && !cardSession) drawCard();
-    try { localStorage.setItem('mixtape-lang', lang); } catch (error) { /* koi baat nahi */ }
-}
-
-document.querySelectorAll('#lang-switch button').forEach(function (button) {
-    button.addEventListener('click', async function () {
-        lang = button.dataset.lang;
-        if (lang === 'ur') {
-            try { await document.fonts.load('52px "Noto Nastaliq Urdu"', 'سالگرہ'); } catch (error) { /* koi baat nahi */ }
-        }
-        applyLanguage();
-    });
-});
-
-applyLanguage();

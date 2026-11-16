@@ -21,10 +21,6 @@
 | 👾 **Pixel hearts** | Pixel art drawn with one tiny box and 27 `box-shadow` copies, bouncing on every note |
 | 🎂 **Birthday card** | Asks for both names, then shows a Happy Birthday message |
 
-## 🌍 Three languages
-
-Switch between **English**, **اردو** and **Türkçe** with the button in the top corner. Every screen changes, even the video card. Urdu is written right to left in a Nastaliq font. The chosen language also goes into the share link (`&lang=ur`), so your friend opens it in the same language.
-
 ## 🎹 How the music works
 
 There are no mp3 files. Every sound is made live by the browser's **Web Audio API**:
