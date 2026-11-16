@@ -476,3 +476,105 @@ html, body {
     align-items: center;
     gap: 15px;
 }
+
+/* ---------- intro: naam wala card + birthday message ---------- */
+/* poori screen par halka parda, card beech mein */
+.intro{
+    position: absolute;
+    inset: 0;                         /* top, right, bottom, left sab 0 - poori jagah */
+    background-color: rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;                     /* sab stickers ke upar */
+}
+.intro.hidden{
+    display: none;
+}
+.intro-card{
+    width: 320px;
+    max-width: calc(100% - 32px);
+    background-color: white;
+    border: 3px solid black;
+    border-radius: 10px;
+    box-shadow: 4px 4px 0 black;
+    overflow: hidden;
+}
+.intro-title{
+    font-size: 13px;
+    font-weight: bold;
+}
+.intro-body{
+    padding: 20px 24px 24px;
+    background-color: #fff0f5;
+    text-align: center;
+}
+.intro-body h2{
+    margin: 0 0 14px;
+    color: darkblue;
+}
+.name-step{
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+.name-step label{
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+.name-step input{
+    font: inherit;
+    padding: 8px 10px;
+    margin-bottom: 12px;
+    border: 2px solid black;
+    border-radius: 8px;
+    outline: none;
+}
+.name-step input:focus{
+    box-shadow: 2px 2px 0 palevioletred;
+}
+.intro-error{
+    color: rgb(211, 41, 112);
+    font-size: 13px;
+    font-weight: bold;
+    min-height: 18px;
+    margin: 0 0 8px;
+}
+.intro-button{
+    font: inherit;
+    font-weight: bold;
+    color: black;
+    background-color: yellow;
+    border: 2px solid black;
+    border-radius: 20px;
+    box-shadow: 3px 3px 0 black;
+    padding: 8px 18px;
+    cursor: pointer;
+    align-self: center;
+}
+.intro-button:hover{
+    transform: scale(1.05);
+}
+.intro-button:active{
+    transform: translate(2px, 2px);   /* dabaane par neeche dabta lage */
+    box-shadow: 1px 1px 0 black;
+}
+.message-step p{
+    margin: 0 0 18px;
+    font-size: 17px;
+    line-height: 1.5;
+}
+.message-step.hidden,
+.name-step.hidden{
+    display: none;
+}
+/* player ke title bar mein dono ke naam */
+.player-title{
+    font-size: 13px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;          /* lamba naam ho to ... */
+    max-width: 230px;
+}

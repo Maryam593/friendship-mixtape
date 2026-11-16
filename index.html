@@ -199,6 +199,8 @@
                     <div class="dot-two"></div>
                     <div class="dot-three"></div>
                     </div>
+                    <!-- dono ke naam (JS likhegi) -->
+                    <div class="player-title" id="player-title"></div>
                     <!-- controls -->
                      <div class="controls">
                         <div class="control-3">_</div>
@@ -270,6 +272,37 @@
                 <div class="pixel-heart"></div>
             </div>
           </div>
+        <!-- intro - naam pucho, phir birthday message (sab ke upar) -->
+        <div class="intro" id="intro">
+            <div class="intro-card">
+                <div class="mini-title-bar">
+                    <div class="dots">
+                        <div class="dot-one"></div>
+                        <div class="dot-two"></div>
+                        <div class="dot-three"></div>
+                    </div>
+                    <div class="intro-title">mixtape.exe</div>
+                </div>
+                <div class="intro-body">
+                    <!-- screen 1: naam -->
+                    <form class="name-step" id="name-step">
+                        <h2>make a mixtape 💿</h2>
+                        <label for="from-name">your name</label>
+                        <input type="text" id="from-name" maxlength="20" autocomplete="off">
+                        <label for="to-name">your friend's name</label>
+                        <input type="text" id="to-name" maxlength="20" autocomplete="off">
+                        <p class="intro-error" id="intro-error"></p>
+                        <button type="submit" class="intro-button">make my mixtape</button>
+                    </form>
+                    <!-- screen 2: birthday message -->
+                    <div class="message-step hidden" id="message-step">
+                        <h2>Happy Birthday <span id="msg-to"></span>! 🎂</h2>
+                        <p><span id="msg-from"></span> made you a mixtape 💗<br>please listen</p>
+                        <button type="button" class="intro-button" id="listen-button">listen ▶</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="./script.js"></script>
 </body>
