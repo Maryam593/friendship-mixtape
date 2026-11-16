@@ -145,7 +145,20 @@ function scheduler() {
             currentStep = 0;
         }
     }
+    updateProgress();
 }
+
+// progress bar: kitne steps baj chuke = kitna % bhara
+function updateProgress() {
+    bar.value = (currentStep / track.length) * 100;
+    updateFill();
+}
+
+// slider ghaseeto to gaana bhi wahin pahunch jaye
+bar.addEventListener('input', function () {
+    if (!track) return;
+    currentStep = Math.min(track.length - 1, Math.round((bar.value / 100) * track.length));
+});
 
 function play() {
     if (fromName === '' || toName === '') return;
