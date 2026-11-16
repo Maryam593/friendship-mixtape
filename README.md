@@ -1,6 +1,6 @@
 # 💗 friendship-mixtape
 
-> A cute, doodle-style music player page made with plain **HTML + CSS** — pink grid, sticker vibes, and a little mixtape for friendship. 🎀
+> A cute, doodle-style birthday mixtape made with plain **HTML + CSS + JS**. Type your name and your friend's name, and the page composes a little song from both names. 🎀
 
 ![design inspiration](doodle.PNG)
 
@@ -14,14 +14,31 @@
 | 💬 **PLAY / COOL bubbles** | Tilted speech-bubble stickers with bold text |
 | ⭐ **Starbursts** | 12-point stars cut out with `clip-path: polygon()` |
 | 🎵 **Mixtape player** | Window with a title bar, colored dots, `_ □ x` controls |
-| 🎚️ **Progress slider** | A real, draggable `<input type="range">`, custom styled in pink |
+| 🎚️ **Progress slider** | A real, draggable `<input type="range">` that follows the song |
+| ⏮ ▶ ⏭ **Buttons** | Play / pause and three tracks to skip between |
+| 🌼 **Daisy flower** | 12 petals placed with `rotate()` + `translateY()`, spins while music plays |
+| 💌 **Heart bubble** | A heart made from two circles and a rotated square |
+| 👾 **Pixel hearts** | Pixel art drawn with one tiny box and 27 `box-shadow` copies, bouncing on every note |
+| 🎂 **Birthday card** | Asks for both names, then shows a Happy Birthday message |
+
+## 🎹 How the music works
+
+There are no mp3 files. Every sound is made live by the browser's **Web Audio API**:
+
+1. Each letter of a name becomes a number (`a` = 97...), and that number picks a note from a **pentatonic scale** (C D E G A), so every name sounds sweet.
+2. **Your name** plays the melody (a `square` wave, very 8-bit 👾) and **your friend's name** plays the bass (a `triangle` wave).
+3. Spaces become little rests. The shorter name loops so both layers play together.
+4. Same names = the same song every time. It's *your* friendship's song 💗
+
+## 🔗 Send it to a friend
+
+After you make a mixtape, the link holds both names, like `index.html?from=Maryam&to=Ayesha`.
+Press **copy link to send**, share it, and your friend lands straight on their birthday message. 🎁
 
 ## 🚧 Coming soon
 
-- [ ] ⏮ ⭐ ⏭ player buttons
-- [ ] 🌼 Daisy flower
-- [ ] 💌 Heart bubble with a pointing hand
-- [ ] 💗 Mini window with pixel hearts
+- [ ] `_ □ x` window buttons that actually work
+- [ ] Looks nice on phones too (responsive)
 - [ ] Star outlines
 
 ## 🎀 How to run
@@ -38,6 +55,7 @@ No installs, no build — just open it:
 friendship-mixtape/
 ├── index.html   → the page structure
 ├── style.css    → all the cute styling
+├── script.js    → names, music and buttons
 └── doodle.PNG   → the design reference
 ```
 
@@ -49,6 +67,8 @@ friendship-mixtape/
 - One `transform` line can hold both `translate()` and `rotate()`
 - Child styles win over parent styles (hello, `font-size` bug!)
 - Styling a range slider with `::-webkit-slider-thumb` and `::-moz-range-thumb`
+- Pixel art with many `box-shadow`s, and an outline that follows the shape with `filter: drop-shadow()`
+- Making music with an oscillator, and scheduling notes on the audio clock
 
 ---
 
