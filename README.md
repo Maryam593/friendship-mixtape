@@ -32,8 +32,9 @@ There are no mp3 files. Every sound is made live by the browser's **Web Audio AP
 1. Each letter of a name becomes a number (`a` = 97...), and that number picks a note from a **pentatonic scale** (C D E G A), so every name sounds sweet.
 2. **Your name** plays a soft music-box melody (`triangle` + `sine` waves) and **your friend's name** plays a gentle low line.
 3. Underneath, soft chords go **C → G → Am → F** (like lots of pop songs), with a deep bass and a little **reverb** so it sounds like a room.
-4. Spaces become little rests. The shorter name loops so both layers play together.
-5. Same names = the same song every time. It's *your* friendship's song 💗
+4. 🎤 A **synthesized voice** sings along! It's made from a buzzing `sawtooth` wave shaped by three filters (*formants*, the way your mouth shapes "aa", "ee", "oo"), plus a little vibrato. It sings the vowels of a name: "Ayesha" → "aa… ee… aa…". In the lullaby it just hums "oooh".
+5. Spaces become little rests. The shorter name loops so both layers play together.
+6. Same names = the same song every time. It's *your* friendship's song 💗
 
 ## 🔗 Send it to a friend
 
@@ -45,7 +46,8 @@ Press **copy link to send**, share it, and your friend lands straight on their b
 Press **get your card 💿** under the player:
 
 - **Tap the card** to play its song right there. The black & white sound wave turns white as the song plays, and the vinyl spins.
-- **download video 🎬** records the card with its song (about 16 seconds) and saves it as an `.mp4` (or `.webm` on some browsers).
+- Pick **which track** to use: side a, side b or the lullaby.
+- **download video 🎬** records the card with its song (about 20 seconds) and saves it as an `.mp4` (or `.webm` on some browsers).
 - It's sized 1080×1350, ready for WhatsApp, Instagram or a story. Your friend taps it and hears their song. 💗
 - Keep the tab open while it records!
 
