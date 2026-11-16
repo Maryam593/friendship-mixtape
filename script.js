@@ -79,16 +79,53 @@ function toFreq(semitones) {
     return BASE_FREQ * Math.pow(2, semitones / 12);
 }
 
-// do layers: tumhara naam = upar wali dhun, dost ka naam = neeche wala bass
-function makeTrack() {
+// mixtape mein 3 tracks - har ek dono naamon se, magar alag andaaz mein
+const TRACK_COUNT = 3;
+
+function makeTrack(index) {
+    if (index === 0) {
+        // track 1: tumhara naam = upar wali dhun, dost ka naam = neeche wala bass
+        return {
+            layers: [
+                { notes: nameToNotes(fromName, 1), type: 'square', volume: 0.07, every: 1 },
+                { notes: nameToNotes(toName, -1), type: 'triangle', volume: 0.25, every: 2 },
+            ],
+            stepTime: 0.25,    // har step kitne second ka
+            length: 64,        // kitne steps ka gaana
+        };
+    }
+    if (index === 1) {
+        // track 2: ulta - dost ki dhun upar, tumhara bass neeche, thora tez
+        return {
+            layers: [
+                { notes: nameToNotes(toName, 1), type: 'square', volume: 0.07, every: 1 },
+                { notes: nameToNotes(fromName, -1), type: 'triangle', volume: 0.25, every: 2 },
+            ],
+            stepTime: 0.2,
+            length: 64,
+        };
+    }
+    // track 3: lori (lullaby) - dono naam ek saath, naram sine awaaz, dheere
+    const together = fromName + ' ' + toName;
     return {
         layers: [
-            { notes: nameToNotes(fromName, 1), type: 'square', volume: 0.07, every: 1 },
-            { notes: nameToNotes(toName, -1), type: 'triangle', volume: 0.25, every: 2 },
+            { notes: nameToNotes(together, 1), type: 'sine', volume: 0.18, every: 1 },
+            { notes: nameToNotes(together, -1).reverse(), type: 'triangle', volume: 0.2, every: 4 },
         ],
-        stepTime: 0.25,    // har step kitne second ka
-        length: 64,        // kitne steps ka gaana
+        stepTime: 0.35,
+        length: 48,
     };
+}
+
+let trackIndex = 0;
+
+// track badlo (0, 1, 2 - aakhri ke baad wapas pehla)
+function changeTrack(index) {
+    trackIndex = (index + TRACK_COUNT) % TRACK_COUNT;
+    track = makeTrack(trackIndex);
+    currentStep = 0;
+    playerTitle.textContent = fromName + ' 💗 ' + toName + ' · ' + (trackIndex + 1) + '/' + TRACK_COUNT;
+    updateProgress();
 }
 
 let audioCtx = null;       // speaker ka switch
@@ -142,7 +179,7 @@ function scheduler() {
         nextStepTime += track.stepTime;
         currentStep++;
         if (currentStep >= track.length) {
-            currentStep = 0;
+            changeTrack(trackIndex + 1);           // gaana khatam - agla track
         }
     }
     updateProgress();
@@ -164,7 +201,7 @@ function play() {
     if (fromName === '' || toName === '') return;
     setupAudio();
     audioCtx.resume();
-    if (!track) track = makeTrack();
+    if (!track) changeTrack(0);
     isPlaying = true;
     nextStepTime = Math.max(nextStepTime, audioCtx.currentTime + 0.05);
     timerId = setInterval(scheduler, 25);
@@ -186,4 +223,14 @@ playButton.addEventListener('click', function () {
     } else {
         play();
     }
+});
+
+// ⏮ pichhla track, ⏭ agla track
+document.querySelector('.previous-button').addEventListener('click', function () {
+    if (fromName === '') return;
+    changeTrack(trackIndex - 1);
+});
+document.querySelector('.next-button').addEventListener('click', function () {
+    if (fromName === '') return;
+    changeTrack(trackIndex + 1);
 });
