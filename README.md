@@ -35,6 +35,15 @@ There are no mp3 files. Every sound is made live by the browser's **Web Audio AP
 After you make a mixtape, the link holds both names, like `index.html?from=Ali&to=Sara`.
 Press **copy link to send**, share it, and your friend lands straight on their birthday message. 🎁
 
+## 🎬 Video music card
+
+Press **get your card 💿** under the player:
+
+- **Tap the card** to play its song right there. The sound wave fills up with pink as the song plays.
+- **download video 🎬** records the card with its song (about 16 seconds) and saves it as an `.mp4` (or `.webm` on some browsers).
+- It's sized 1080×1350, ready for WhatsApp, Instagram or a story. Your friend taps it and hears their song. 💗
+- Keep the tab open while it records!
+
 ## 🚧 Coming soon
 
 - [ ] `_ □ x` window buttons that actually work
@@ -69,6 +78,7 @@ friendship-mixtape/
 - Styling a range slider with `::-webkit-slider-thumb` and `::-moz-range-thumb`
 - Pixel art with many `box-shadow`s, and an outline that follows the shape with `filter: drop-shadow()`
 - Making music with an oscillator, and scheduling notes on the audio clock
+- Drawing on a `<canvas>` and recording it with sound using `MediaRecorder`
 
 ---
 
