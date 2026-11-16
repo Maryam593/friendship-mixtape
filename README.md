@@ -2,7 +2,7 @@
 
 > A cute, doodle-style birthday mixtape made with plain **HTML + CSS + JS**. Type your name and your friend's name, and the page composes a little song from both names. 🎀
 
-**🌐 Try it live:** [friendship-mixtape.vercel.app](https://friendship-mixtape.vercel.app)
+### 🌐 Try it live → [friendship-mixtape.vercel.app](https://friendship-mixtape.vercel.app)
 
 ![design inspiration](doodle.PNG)
 
@@ -36,7 +36,8 @@ There are no mp3 files. Every sound is made live by the browser's **Web Audio AP
 
 ## 🔗 Send it to a friend
 
-After you make a mixtape, the link holds both names, like `index.html?from=Ali&to=Sara`.
+After you make a mixtape, the link holds both names, like
+[`friendship-mixtape.vercel.app/?from=Ali&to=Sara`](https://friendship-mixtape.vercel.app/?from=Ali&to=Sara)
 Press **copy link to send**, share it, and your friend lands straight on their birthday message. 🎁
 
 ## 🎬 Video music card
@@ -57,7 +58,9 @@ Press **get your card 💿** under the player:
 
 ## 🎀 How to run
 
-No installs, no build — just open it:
+Easiest: open **[friendship-mixtape.vercel.app](https://friendship-mixtape.vercel.app)** 🌐
+
+Or run it on your computer. No installs, no build:
 
 1. Download / clone this folder
 2. Double-click **`index.html`**
