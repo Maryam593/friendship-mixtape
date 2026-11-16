@@ -47,7 +47,7 @@ Press **get your card 💿** under the player:
 ## 🚧 Coming soon
 
 - [ ] `_ □ x` window buttons that actually work
-- [ ] Looks nice on phones too (responsive)
+- [x] Looks nice on phones too (responsive)
 - [ ] Star outlines
 
 ## 🎀 How to run
