@@ -657,3 +657,11 @@ html, body {
     cursor: pointer;
     padding: 0;
 }
+.card-preview{
+    cursor: pointer;                  /* card par click = gaana */
+}
+.intro-button:disabled{
+    background-color: #eee;
+    cursor: wait;
+    transform: none;
+}

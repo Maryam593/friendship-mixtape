@@ -190,20 +190,24 @@ function playNote(freq, time, duration, type, volume) {
     gain.connect(master);
     osc.start(time);
     osc.stop(time + duration + 0.05);
+    return osc;            // card wala gaana beech mein rokna ho to kaam aaye
 }
 
 // ek step par har layer ka sur bajao
-function playStep(step, time) {
-    track.layers.forEach(function (layer, layerNumber) {
+// (whichTrack: kaun sa gaana - player ka ya card ka. bounce: pixel dil uchhlein ya nahi)
+function playStep(step, time, whichTrack = track, bounce = true) {
+    const played = [];
+    whichTrack.layers.forEach(function (layer, layerNumber) {
         if (step % layer.every !== 0) return;     // bass har doosre step par
         const index = Math.floor(step / layer.every) % layer.notes.length;  // chhota naam dobara se (loop)
         const note = layer.notes[index];
         if (note === null) return;                // khamoshi
-        playNote(toFreq(note), time, track.stepTime * layer.every * 0.9, layer.type, layer.volume);
-        if (layerNumber === 0) {
+        played.push(playNote(toFreq(note), time, whichTrack.stepTime * layer.every * 0.9, layer.type, layer.volume));
+        if (bounce && layerNumber === 0) {
             bounceHeart(step % pixelHearts.length, time);   // upar wali dhun ke har sur par ek dil uchhle
         }
     });
+    return played;
 }
 
 // pixel dil ko theek usi waqt uchhalo jab sur baje
@@ -351,13 +355,14 @@ function drawPixelHeart(c, x, y, pixel) {
 }
 
 // sound wave: dono naamon ke sur -> lehar kahan oonchi, kahan neechi
-function drawWave(c, x, centerY, width, height) {
+// progress: 0 se 1 - jitna gaana baj chuka utni lehar gehri gulabi, baqi halki
+function drawWave(c, x, centerY, width, height, progress) {
     const notes = nameToNotes(fromName + ' ' + toName, 0);
     const heights = notes.map(function (note) {
         return note === null ? 0.12 : 0.3 + (note / 21) * 0.7;   // space = choti lehar
     });
     const cycles = 28;                     // kitni baar upar neeche ho
-    c.beginPath();
+    const wave = new Path2D();             // lehar ka raasta alag se yaad rakho - teen baar banana hai
     for (let px = 0; px <= width; px += 2) {
         const t = px / width;              // 0 se 1 tak - kitna aage aa gaye
         const spot = t * (heights.length - 1);
@@ -368,19 +373,54 @@ function drawWave(c, x, centerY, width, height) {
         const edge = Math.sqrt(Math.sin(Math.PI * t));             // shuru aur aakhir mein patli
         const amp = (a + (b - a) * smooth) * edge * (height / 2);
         const y = centerY + Math.sin(t * cycles * Math.PI * 2) * amp;
-        if (px === 0) c.moveTo(x + px, y); else c.lineTo(x + px, y);
+        if (px === 0) wave.moveTo(x + px, y); else wave.lineTo(x + px, y);
     }
     c.lineCap = 'round';
     c.lineJoin = 'round';
     c.strokeStyle = 'black';               // pehle moti kaali line (outline)
     c.lineWidth = 18;
-    c.stroke();
-    c.strokeStyle = 'palevioletred';       // phir upar patli gulabi
+    c.stroke(wave);
+    c.strokeStyle = '#f9d3e0';             // phir upar patli halki gulabi (abhi nahi baja)
     c.lineWidth = 9;
-    c.stroke();
+    c.stroke(wave);
+    // jitna baj chuka - sirf utne hisse mein gehri gulabi (clip = baqi hissa chhupa do)
+    c.save();
+    c.beginPath();
+    c.rect(x - 20, centerY - height, width * progress + 20, height * 2);
+    c.clip();
+    c.strokeStyle = 'palevioletred';
+    c.stroke(wave);
+    c.restore();
 }
 
-function drawCard() {
+// card par chhota sa player wala progress bar
+function drawCardProgress(c, centerX, y, progress, label) {
+    const width = 600, left = centerX - width / 2;
+    roundedBox(c, left, y - 11, width, 22, 11);
+    c.fillStyle = 'white';
+    c.fill();
+    if (progress > 0) {
+        roundedBox(c, left, y - 11, Math.max(22, width * progress), 22, 11);
+        c.fillStyle = 'palevioletred';
+        c.fill();
+    }
+    roundedBox(c, left, y - 11, width, 22, 11);
+    c.lineWidth = 5;
+    c.strokeStyle = 'black';
+    c.stroke();
+    // gol dot
+    c.beginPath();
+    c.arc(left + width * progress, y, 20, 0, Math.PI * 2);
+    c.fillStyle = 'palevioletred';
+    c.fill();
+    c.stroke();
+    c.fillStyle = 'gray';
+    c.font = 'bold 26px system-ui, "Segoe UI", sans-serif';
+    c.fillText(label, centerX, y + 48);
+}
+
+// progress: kitna gaana baj chuka (0 se 1). label: progress bar ke neeche likhai
+function drawCard(progress = 0, label = 'tap the card to play ▶') {
     const c = cardCanvas.getContext('2d');
     const W = cardCanvas.width;            // 1080
     const H = cardCanvas.height;           // 1350
@@ -433,7 +473,7 @@ function drawCard() {
     fitText(c, toName, 780, 130, 'bold');
     c.fillText(toName, W / 2, 470);
 
-    drawWave(c, 160, 710, 760, 320);
+    drawWave(c, 160, 705, 760, 320, progress);
 
     c.fillStyle = 'black';
     fitText(c, 'a mixtape from ' + fromName + ' 💗', 780, 46, 'bold');
@@ -441,12 +481,10 @@ function drawCard() {
 
     // teen pixel dil
     for (let i = 0; i < 3; i++) {
-        drawPixelHeart(c, W / 2 - 187 + i * 138, 990, 14);
+        drawPixelHeart(c, W / 2 - 187 + i * 138, 975, 13);
     }
 
-    c.fillStyle = 'gray';
-    c.font = '30px system-ui, "Segoe UI", sans-serif';
-    c.fillText('▶ press play on your friendship', W / 2, 1135);
+    drawCardProgress(c, W / 2, 1093, progress, label);
 
     // card ki kaali border sab se aakhir mein - taake upar rahe
     roundedBox(c, x, y, w, h, r);
@@ -463,26 +501,136 @@ function drawCard() {
     c.fillText('friendship mixtape', W / 2, 1275);
 }
 
+// ---------- card ka gaana: card par click = bajao, download = video (tasveer + awaaz) ----------
+const cardDownload = document.querySelector('#card-download');
+const DOWNLOAD_TEXT = 'download video 🎬';
+let cardSession = null;    // abhi card ka gaana chal raha hai to uski saari maloomat, warna null
+
+// 75 second -> "1:15"
+function formatTime(seconds) {
+    const s = Math.max(0, Math.floor(seconds));
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+
+// browser kaun si video bana sakta hai? mp4 sab jagah chalti hai, warna webm
+function pickVideoType() {
+    const types = ['video/mp4;codecs=avc1,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm'];
+    return types.find(function (type) { return MediaRecorder.isTypeSupported(type); }) || '';
+}
+
+// koi bhi file download karwao: chhupa hua link banao aur khud click karo
+function downloadBlob(blob, extension) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    // file ke naam mein ye harf mana hote hain: \ / : * ? " < > | aur space
+    link.download = 'mixtape-for-' + toName.replace(/[\\/:*?"<>|\s]+/g, '-') + '.' + extension;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);   // memory saaf
+}
+
+// card ka gaana bajao (track 1). record = true ho to saath saath video bhi banao
+function playCard(record) {
+    stopCard();
+    if (isPlaying) pause();                 // player wala gaana roko, warna do gaane ek saath
+    setupAudio();
+    audioCtx.resume();
+
+    const cardTrack = makeTrack(0);
+    const duration = cardTrack.length * cardTrack.stepTime;
+    const start = audioCtx.currentTime + 0.4;  // thora ruk kar shuru - video ka pehla frame saaf aaye
+    const session = { notes: [], recorder: null, timer: null, cancelled: false };
+
+    // poore gaane ke sur ek saath tay kar do (sirf 16 second ka hai)
+    for (let step = 0; step < cardTrack.length; step++) {
+        session.notes.push(...playStep(step, start + step * cardTrack.stepTime, cardTrack, false));
+    }
+
+    if (record) {
+        // video = canvas ki tasveerein + gaane ki awaaz
+        const soundOut = audioCtx.createMediaStreamDestination();
+        master.connect(soundOut);
+        const stream = new MediaStream([
+            ...cardCanvas.captureStream(30).getVideoTracks(),
+            ...soundOut.stream.getAudioTracks(),
+        ]);
+        const type = pickVideoType();
+        const recorder = new MediaRecorder(stream, type ? { mimeType: type, videoBitsPerSecond: 4000000 } : {});
+        const pieces = [];
+        recorder.ondataavailable = function (event) {
+            if (event.data.size > 0) pieces.push(event.data);
+        };
+        recorder.onstop = function () {
+            master.disconnect(soundOut);
+            stream.getTracks().forEach(function (t) { t.stop(); });
+            cardDownload.disabled = false;
+            cardDownload.textContent = DOWNLOAD_TEXT;
+            if (session.cancelled) return;  // beech mein band kiya - download nahi
+            const blob = new Blob(pieces, { type: recorder.mimeType });
+            downloadBlob(blob, recorder.mimeType.includes('mp4') ? 'mp4' : 'webm');
+        };
+        recorder.start();
+        session.recorder = recorder;
+        cardDownload.disabled = true;
+        cardDownload.textContent = 'recording... keep this tab open ⏺';
+    }
+
+    // har 33ms (30 frame/second) card dobara banao - lehar aur progress aage
+    session.timer = setInterval(function () {
+        const t = audioCtx.currentTime - start;
+        const progress = Math.min(1, Math.max(0, t / duration));
+        drawCard(progress, formatTime(t) + ' / ' + formatTime(duration));
+        if (t >= duration + 0.3) {
+            clearInterval(session.timer);
+            if (session.recorder) session.recorder.stop();
+            cardSession = null;
+        }
+    }, 33);
+    cardSession = session;
+}
+
+// card ka gaana beech mein roko
+function stopCard() {
+    if (!cardSession) return;
+    clearInterval(cardSession.timer);
+    cardSession.notes.forEach(function (osc) {
+        try { osc.stop(); } catch (error) { /* pehle hi ruk chuka */ }
+    });
+    if (cardSession.recorder && cardSession.recorder.state === 'recording') {
+        cardSession.cancelled = true;
+        cardSession.recorder.stop();
+    }
+    cardSession = null;
+    drawCard();
+}
+
 cardButton.addEventListener('click', function () {
     if (fromName === '' || toName === '') return;
     drawCard();
     cardPopup.classList.remove('hidden');
 });
 cardClose.addEventListener('click', function () {
+    stopCard();
     cardPopup.classList.add('hidden');
 });
 
-// download: canvas -> png file -> chhupa hua link -> khud click
-document.querySelector('#card-download').addEventListener('click', function () {
-    cardCanvas.toBlob(function (blob) {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        // file ke naam mein ye harf mana hote hain: \ / : * ? " < > | aur space
-        link.download = 'mixtape-for-' + toName.replace(/[\/:*?"<>|\s]+/g, '-') + '.png';
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);   // memory saaf
-    }, 'image/png');
+// card par click: chal raha hai to roko, warna bajao (video ban rahi ho to kuch nahi)
+cardCanvas.addEventListener('click', function () {
+    if (cardSession && cardSession.recorder) return;
+    if (cardSession) {
+        stopCard();
+    } else {
+        playCard(false);
+    }
+});
+
+cardDownload.textContent = DOWNLOAD_TEXT;
+cardDownload.addEventListener('click', function () {
+    if (typeof MediaRecorder === 'undefined') {
+        cardDownload.textContent = 'this browser cannot make videos 😢';
+        return;
+    }
+    playCard(true);
 });
