@@ -471,3 +471,18 @@ cardButton.addEventListener('click', function () {
 cardClose.addEventListener('click', function () {
     cardPopup.classList.add('hidden');
 });
+
+// download: canvas -> png file -> chhupa hua link -> khud click
+document.querySelector('#card-download').addEventListener('click', function () {
+    cardCanvas.toBlob(function (blob) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        // file ke naam mein ye harf mana hote hain: \ / : * ? " < > | aur space
+        link.download = 'mixtape-for-' + toName.replace(/[\/:*?"<>|\s]+/g, '-') + '.png';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);   // memory saaf
+    }, 'image/png');
+});
