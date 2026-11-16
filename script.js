@@ -551,7 +551,10 @@ function playCard(record) {
     if (record) {
         // video = canvas ki tasveerein + gaane ki awaaz
         const soundOut = audioCtx.createMediaStreamDestination();
-        master.connect(soundOut);
+        const louder = audioCtx.createGain();   // video mein awaaz thori oonchi (phone par dheemi lagti thi)
+        louder.gain.value = 2;
+        master.connect(louder);
+        louder.connect(soundOut);
         const stream = new MediaStream([
             ...cardCanvas.captureStream(30).getVideoTracks(),
             ...soundOut.stream.getAudioTracks(),
@@ -563,7 +566,7 @@ function playCard(record) {
             if (event.data.size > 0) pieces.push(event.data);
         };
         recorder.onstop = function () {
-            master.disconnect(soundOut);
+            master.disconnect(louder);
             stream.getTracks().forEach(function (t) { t.stop(); });
             cardDownload.disabled = false;
             cardDownload.textContent = DOWNLOAD_TEXT;
