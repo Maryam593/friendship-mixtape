@@ -39,7 +39,39 @@ nameStep.addEventListener('submit', function (event) {
         return;
     }
     introError.textContent = '';
+    saveNamesInLink();
     showMessage();
+});
+
+// ---------- share link: naam link mein (?from=...&to=...) ----------
+// dost ko ye link bhejo - wo kholegi to seedha birthday message aayega
+function saveNamesInLink() {
+    const params = new URLSearchParams({ from: fromName, to: toName });
+    try {
+        history.replaceState(null, '', '?' + params.toString());   // page reload kiye baghair address badlo
+    } catch (error) {
+        // kuch browsers file:// par ye nahi karne dete - koi baat nahi
+    }
+}
+
+// page khulte hi dekho: link mein naam hain?
+const linkParams = new URLSearchParams(location.search);
+const linkFrom = (linkParams.get('from') || '').trim().slice(0, 20);
+const linkTo = (linkParams.get('to') || '').trim().slice(0, 20);
+if (linkFrom !== '' && linkTo !== '') {
+    fromName = linkFrom;
+    toName = linkTo;
+    showMessage();
+}
+
+const copyLinkButton = document.querySelector('#copy-link');
+copyLinkButton.addEventListener('click', async function () {
+    try {
+        await navigator.clipboard.writeText(location.href);
+        copyLinkButton.textContent = 'copied! now send it 💌';
+    } catch (error) {
+        copyLinkButton.textContent = 'copy the link from the address bar ☝';
+    }
 });
 
 // screen 2 -> player (aur gaana shuru!)

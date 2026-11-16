@@ -604,3 +604,15 @@ html, body {
 .pixel-heart.beat{
     animation: beat 0.2s ease-out;
 }
+/* chhota sa link copy button - bara yellow button se kam zaroori */
+.copy-link{
+    display: block;
+    margin: 14px auto 0;
+    font: inherit;
+    font-size: 13px;
+    color: darkblue;
+    background: none;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+}
