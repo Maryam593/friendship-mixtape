@@ -478,6 +478,36 @@ document.querySelector('.next-button').addEventListener('click', function () {
     changeTrack(trackIndex + 1);
 });
 
+// ---------- window ke buttons: _ □ x ----------
+const playerWindow = document.querySelector('.player');
+const openPlayerButton = document.querySelector('#open-player');
+
+// _ : chhota karo (dobara dabao to wapas) - gaana chalta rehta hai
+document.querySelector('#minimize-button').addEventListener('click', function () {
+    playerWindow.classList.remove('maximized');
+    playerWindow.classList.toggle('minimized');
+});
+
+// □ : bara karo (dobara dabao to wapas)
+document.querySelector('#maximize-button').addEventListener('click', function () {
+    playerWindow.classList.remove('minimized');
+    playerWindow.classList.toggle('maximized');
+});
+
+// x : gaana roko, window band, aur "open player" button dikhao
+document.querySelector('#close-button').addEventListener('click', function () {
+    if (isPlaying) pause();
+    playerWindow.classList.remove('minimized', 'maximized');
+    playerWindow.classList.add('closed');
+    openPlayerButton.classList.remove('hidden');
+});
+
+// "open player" : window wapas (gaana wahin se chalega jahan ruka tha - ▶ dabao)
+openPlayerButton.addEventListener('click', function () {
+    playerWindow.classList.remove('closed');
+    openPlayerButton.classList.add('hidden');
+});
+
 // ---------- music card: naamon ki dhun se bani tasveer (canvas) ----------
 const cardButton = document.querySelector('#card-button');
 const cardPopup = document.querySelector('#card-popup');

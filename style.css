@@ -189,6 +189,60 @@ html, body {
     gap: 10px;
     color: black;
 }
+/* _ □ x - button hain, magar button jaise nahi dikhte (sirf nishaan) */
+.controls button{
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    padding: 0 2px;
+    cursor: pointer;
+    line-height: 1;
+}
+.controls button:hover{
+    transform: scale(1.3);
+}
+.player{
+    transition: transform 0.25s ease;     /* bara / chhota hote waqt naram sa */
+}
+/* _ : sirf title bar bache, body chhup jaye (gaana chalta rahe) */
+.player.minimized{
+    height: auto;
+}
+.player.minimized .player-body{
+    display: none;
+}
+/* □ : window bari - baqi sab ke upar */
+.player.maximized{
+    transform: scale(1.3);
+    transform-origin: top left;
+    z-index: 60;
+}
+/* x : window band */
+.player.closed{
+    display: none;
+}
+/* band player ki jagah chhota sa button */
+.open-player{
+    position: absolute;
+    top: 30%;
+    left: 35%;
+    z-index: 10;
+    font: inherit;
+    font-weight: bold;
+    background-color: plum;
+    border: 3px solid black;
+    border-radius: 20px;
+    box-shadow: 3px 3px 0 black;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+.open-player:hover{
+    transform: scale(1.05);
+}
+.open-player.hidden{
+    display: none;
+}
 .player-body{
     padding: 30px 40px;
 }
@@ -693,7 +747,20 @@ html, body {
         grid-column: 1 / -1;
     }
     /* tarteeb: player, card button, phool + dil, mini window */
-    .player{ grid-row: 1; }
+    .player,
+    .open-player{ grid-row: 1; }
+    .open-player{
+        position: relative;
+        top: auto;
+        left: auto;
+        grid-column: 1 / -1;
+        justify-self: center;
+    }
+    /* phone par jagah kam - thora sa hi bara, beech se */
+    .player.maximized{
+        transform: scale(1.08);
+        transform-origin: top center;
+    }
     .card-button{ grid-row: 2; }
     .pixel-player{ grid-row: 4; }
     .player{
