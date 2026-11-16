@@ -29,7 +29,10 @@ const TEXT = {
         cardHappy: 'happy birthday',
         cardFrom: 'from {name}',
         cardTap: 'tap the card to play ▶',
-        side: 'side a',
+        pickTrack: 'which track?',
+        track1: 'side a',
+        track2: 'side b',
+        track3: 'lullaby',
     },
     ur: {
         makeTitle: 'مکس ٹیپ بنائیں 💿',
@@ -51,7 +54,10 @@ const TEXT = {
         cardHappy: 'سالگرہ مبارک',
         cardFrom: '{name}  کی طرف سے',   // do space - Nastaliq ka space bohat patla hai
         cardTap: 'سننے کے لیے کارڈ پر ٹیپ کریں ▶',
-        side: 'سائیڈ اے',
+        pickTrack: 'کون سا ٹریک؟',
+        track1: 'سائیڈ اے',
+        track2: 'سائیڈ بی',
+        track3: 'لوری',
     },
     tr: {
         makeTitle: 'bir mixtape yap 💿',
@@ -73,7 +79,10 @@ const TEXT = {
         cardHappy: 'iyi ki doğdun',
         cardFrom: 'sevgilerle, {name}',
         cardTap: 'dinlemek için karta dokun ▶',
-        side: 'a yüzü',
+        pickTrack: 'hangi parça?',
+        track1: 'a yüzü',
+        track2: 'b yüzü',
+        track3: 'ninni',
     },
 };
 
@@ -692,7 +701,7 @@ function drawVinyl(c, cx, cy, radius, angle) {
     fitText(c, lower(toName), radius * 0.45, 30, 'bold');
     drawText(c, lower(toName), 0, -radius * 0.1);
     c.font = cardFont('', 18);
-    drawText(c, t('side'), 0, radius * 0.12);
+    drawText(c, t('track' + (cardTrackIndex + 1)), 0, radius * 0.12);   // kaun sa track
     // beech ka chhed
     c.beginPath();
     c.arc(0, 0, 9, 0, Math.PI * 2);
@@ -795,7 +804,7 @@ function playCard(record) {
     setupAudio();
     audioCtx.resume();
 
-    const cardTrack = makeTrack(0);
+    const cardTrack = makeTrack(cardTrackIndex);
     const duration = cardTrack.length * cardTrack.stepTime;
     const start = audioCtx.currentTime + 0.4;  // thora ruk kar shuru - video ka pehla frame saaf aaye
     const session = { notes: [], recorder: null, timer: null, cancelled: false };
@@ -872,8 +881,48 @@ cardButton.addEventListener('click', async function () {
         // Nastaliq font internet se aata hai - canvas par likhne se pehle uska intezar
         try { await document.fonts.load('52px "Noto Nastaliq Urdu"', 'سالگرہ'); } catch (error) { /* koi baat nahi */ }
     }
-    drawCard();
+    chooseCardTrack(trackIndex);           // shuru mein wahi track jo player mein chal raha tha
     cardPopup.classList.remove('hidden');
+});
+
+// ---------- download ke liye track chuno ----------
+let cardTrackIndex = 0;
+const trackButtons = document.querySelectorAll('#track-buttons button');
+function chooseCardTrack(index) {
+    stopCard();                            // pehle wala card gaana band
+    cardTrackIndex = index;
+    trackButtons.forEach(function (button) {
+        button.classList.toggle('active', Number(button.dataset.track) === index);
+    });
+    drawCard();
+}
+trackButtons.forEach(function (button) {
+    button.addEventListener('click', function () {
+        if (cardSession && cardSession.recorder) return;   // video ban rahi ho to track mat badlo
+        chooseCardTrack(Number(button.dataset.track));
+    });
+});
+cardClose.addEventListener('click', function () {
+    stopCard();
+    cardPopup.classList.add('hidden');
+});
+
+// card par click: chal raha hai to roko, warna bajao (video ban rahi ho to kuch nahi)
+cardCanvas.addEventListener('click', function () {
+    if (cardSession && cardSession.recorder) return;
+    if (cardSession) {
+        stopCard();
+    } else {
+        playCard(false);
+    }
+});
+
+cardDownload.addEventListener('click', function () {
+    if (typeof MediaRecorder === 'undefined') {
+        cardDownload.textContent = t('noVideo');
+        return;
+    }
+    playCard(true);
 });
 
 // ---------- zaban lagao: har [data-i18n] wali cheez ki likhai badlo ----------

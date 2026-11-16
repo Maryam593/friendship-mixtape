@@ -818,3 +818,38 @@ html, body {
 .lang-ur .message-step p{
     font-size: 15px;                  /* Nastaliq bara hota hai - line na toote */
 }
+
+/* ---------- card: kaun sa track ---------- */
+.track-pick{
+    margin-bottom: 14px;
+    font-size: 14px;
+    font-weight: bold;
+}
+.track-buttons{
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+.track-buttons button{
+    font: inherit;
+    font-size: 13px;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 14px;
+    padding: 4px 12px;
+    cursor: pointer;
+}
+.track-buttons button.active{
+    background-color: palevioletred;
+    color: white;
+    box-shadow: 2px 2px 0 black;
+}
+/* chhoti screen par popup screen se bahar na jaye - preview ki height ki had */
+.card-preview{
+    max-height: 50vh;
+    width: auto;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
