@@ -295,7 +295,7 @@ html, body {
 .flower{
     position: absolute;
     top: 53%;
-    left: 400px;
+    left: 29%;              /* 1366px screen par 400px - ab har screen ke hisaab se */
     width: 140px;
     height: 140px;
     z-index: 10;
@@ -380,7 +380,7 @@ html, body {
     border-radius:20px;
     position: absolute;
     top:10%;
-    left:1000px;
+    left: 73%;              /* 1366px screen par 1000px - ab har screen ke hisaab se */
     z-index: 10;
     border-bottom: 3px solid black;   
 }
@@ -664,4 +664,110 @@ html, body {
     background-color: #eee;
     cursor: wait;
     transform: none;
+}
+
+/* ---------- responsive: phone aur tablet (900px se chhoti screen) ---------- */
+/* yahan cheezein absolute jagah par nahi - ek ke neeche ek (CSS grid) */
+@media (max-width: 900px){
+    .main{
+        height: auto;
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);   /* do barabar khane (minmax 0 = andar ki cheez khana na phailaye) */
+        justify-items: center;
+        align-items: center;
+        align-content: center;               /* lambi screen par sab beech mein, faltu khaali jagah nahi */
+        gap: 28px 16px;
+        padding: 120px 16px 110px;           /* upar PLAY, neeche COOL stickers ki jagah */
+        box-sizing: border-box;
+    }
+    /* grid lines poore page ke peeche */
+    .grid{
+        position: absolute;
+        inset: 0;
+    }
+    /* ye teeno poori line lein */
+    .player,
+    .card-button,
+    .pixel-player{
+        grid-column: 1 / -1;
+    }
+    /* tarteeb: player, card button, phool + dil, mini window */
+    .player{ grid-row: 1; }
+    .card-button{ grid-row: 2; }
+    .pixel-player{ grid-row: 4; }
+    .player{
+        position: relative;
+        top: auto;
+        left: auto;
+        width: 100%;
+        max-width: 400px;
+        box-sizing: border-box;
+    }
+    .player-body{
+        padding: 24px 20px;
+    }
+    .card-button{
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+    }
+    .card-button:hover{
+        transform: scale(1.05);
+    }
+    .pixel-player{
+        position: relative;
+        top: auto;
+        left: auto;
+    }
+    /* phool aur dil wala box - neeche ek line mein */
+    .flower{
+        position: relative;
+        top: auto;
+        left: auto;
+        grid-row: 3;
+        grid-column: 1;
+    }
+    .heart-sign{
+        grid-row: 3;
+        grid-column: 2;
+    }
+    .heart-bubble{
+        position: relative;
+        top: auto;
+        left: auto;
+    }
+    /* stickers - kinaron par sajawat (content ke upar nahi) */
+    .obj-1{
+        top: 55px;
+        left: 30%;
+    }
+    .obj-2{
+        top: auto;
+        bottom: 25px;
+        left: 30%;
+        transform: translate(-50%, 0) rotate(-10deg);
+    }
+    .star-1,
+    .star-2,
+    .star-3{
+        width: 60px;
+        height: 60px;
+    }
+    .star-1{
+        top: 25px;
+        left: 72%;
+    }
+    .star-2{
+        top: 70px;
+        left: 86%;
+        width: 40px;
+        height: 40px;
+    }
+    .star-3{
+        top: auto;
+        bottom: 25px;
+        left: 72%;
+    }
 }
