@@ -616,3 +616,44 @@ html, body {
     text-decoration: underline;
     cursor: pointer;
 }
+
+/* ---------- music card ---------- */
+/* player ke neeche chhota sa sticker button */
+.card-button{
+    position: absolute;
+    top: calc(30% + 225px);           /* player (30% se 206px lamba) ke thora neeche */
+    left: calc(35% + 203px);          /* player ke beech mein */
+    transform: translateX(-50%);
+    z-index: 10;
+    font: inherit;
+    font-weight: bold;
+    background-color: yellow;
+    border: 3px solid black;
+    border-radius: 20px;
+    box-shadow: 3px 3px 0 black;
+    padding: 8px 18px;
+    cursor: pointer;
+}
+.card-button:hover{
+    transform: translateX(-50%) scale(1.05);
+}
+/* popup thora bara - card ki preview ke liye */
+.card-popup-box{
+    width: 360px;
+}
+.card-preview{
+    display: block;
+    width: 100%;
+    height: auto;                     /* 1080x1350 ki tasveer chhoti dikhe, shape wahi rahe */
+    border-radius: 6px;
+    margin-bottom: 16px;
+}
+.card-close{
+    font: inherit;
+    font-size: 14px;
+    font-weight: bold;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}

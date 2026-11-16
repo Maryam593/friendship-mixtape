@@ -285,3 +285,189 @@ document.querySelector('.next-button').addEventListener('click', function () {
     if (fromName === '') return;
     changeTrack(trackIndex + 1);
 });
+
+// ---------- music card: naamon ki dhun se bani tasveer (canvas) ----------
+const cardButton = document.querySelector('#card-button');
+const cardPopup = document.querySelector('#card-popup');
+const cardCanvas = document.querySelector('#card-canvas');
+const cardClose = document.querySelector('#card-close');
+
+// gol kono wala dabba (canvas mein seedha border-radius nahi hota)
+function roundedBox(c, x, y, w, h, r) {
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.arcTo(x + w, y, x + w, y + h, r);
+    c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r);
+    c.arcTo(x, y, x + w, y, r);
+    c.closePath();
+}
+
+// wahi star jo CSS clip-path mein hai - % ko asal jagah mein badal kar
+const STAR_POINTS = [50,0, 57,23, 75,7, 70,30, 93,25, 77,43, 100,50, 77,57, 93,75, 70,70,
+    75,93, 57,77, 50,100, 43,77, 25,93, 30,70, 7,75, 23,57, 0,50, 23,43, 7,25, 30,30, 25,7, 43,23];
+function drawStar(c, x, y, size, color) {
+    c.beginPath();
+    for (let i = 0; i < STAR_POINTS.length; i += 2) {
+        c.lineTo(x + STAR_POINTS[i] / 100 * size, y + STAR_POINTS[i + 1] / 100 * size);
+    }
+    c.closePath();
+    c.fillStyle = color;
+    c.fill();
+    c.lineWidth = 5;
+    c.strokeStyle = 'black';
+    c.stroke();
+}
+
+// lamba naam ho to font chhota karte jao jab tak jagah mein na aa jaye
+function fitText(c, text, maxWidth, size, weight) {
+    do {
+        c.font = weight + ' ' + size + 'px system-ui, "Segoe UI", sans-serif';
+        size -= 4;
+    } while (c.measureText(text).width > maxWidth && size > 20);
+}
+
+// pixel dil - wahi naqsha jo CSS box-shadow mein hai
+const HEART_MAP = [
+    '.XX.XX.',
+    'XXXXXXX',
+    'XXXXXXX',
+    '.XXXXX.',
+    '..XXX..',
+    '...X...',
+];
+function drawPixelHeart(c, x, y, pixel) {
+    // pehle kaala (thora bara) - outline, phir upar gulabi
+    [['black', 4], ['rgb(211, 41, 112)', 0]].forEach(function ([color, grow]) {
+        c.fillStyle = color;
+        HEART_MAP.forEach(function (row, r) {
+            [...row].forEach(function (cell, col) {
+                if (cell === 'X') {
+                    c.fillRect(x + col * pixel - grow, y + r * pixel - grow, pixel + grow * 2, pixel + grow * 2);
+                }
+            });
+        });
+    });
+}
+
+// sound wave: dono naamon ke sur -> lehar kahan oonchi, kahan neechi
+function drawWave(c, x, centerY, width, height) {
+    const notes = nameToNotes(fromName + ' ' + toName, 0);
+    const heights = notes.map(function (note) {
+        return note === null ? 0.12 : 0.3 + (note / 21) * 0.7;   // space = choti lehar
+    });
+    const cycles = 28;                     // kitni baar upar neeche ho
+    c.beginPath();
+    for (let px = 0; px <= width; px += 2) {
+        const t = px / width;              // 0 se 1 tak - kitna aage aa gaye
+        const spot = t * (heights.length - 1);
+        const a = heights[Math.floor(spot)];
+        const b = heights[Math.ceil(spot)];
+        const mix = spot - Math.floor(spot);
+        const smooth = mix * mix * (3 - 2 * mix);                  // do suron ke beech naram badlav
+        const edge = Math.sqrt(Math.sin(Math.PI * t));             // shuru aur aakhir mein patli
+        const amp = (a + (b - a) * smooth) * edge * (height / 2);
+        const y = centerY + Math.sin(t * cycles * Math.PI * 2) * amp;
+        if (px === 0) c.moveTo(x + px, y); else c.lineTo(x + px, y);
+    }
+    c.lineCap = 'round';
+    c.lineJoin = 'round';
+    c.strokeStyle = 'black';               // pehle moti kaali line (outline)
+    c.lineWidth = 18;
+    c.stroke();
+    c.strokeStyle = 'palevioletred';       // phir upar patli gulabi
+    c.lineWidth = 9;
+    c.stroke();
+}
+
+function drawCard() {
+    const c = cardCanvas.getContext('2d');
+    const W = cardCanvas.width;            // 1080
+    const H = cardCanvas.height;           // 1350
+
+    // gulabi background + grid
+    c.fillStyle = 'palevioletred';
+    c.fillRect(0, 0, W, H);
+    c.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+    c.lineWidth = 2;
+    for (let i = 0; i <= Math.max(W, H); i += 45) {
+        c.beginPath(); c.moveTo(i, 0); c.lineTo(i, H); c.stroke();
+        c.beginPath(); c.moveTo(0, i); c.lineTo(W, i); c.stroke();
+    }
+
+    // card ka dabba - pehle saya, phir safed
+    const x = 90, y = 170, w = 900, h = 1010, r = 30;
+    roundedBox(c, x + 14, y + 14, w, h, r);
+    c.fillStyle = 'black';
+    c.fill();
+    roundedBox(c, x, y, w, h, r);
+    c.fillStyle = 'white';
+    c.fill();
+
+    // title bar (card ke andar hi rahe - clip)
+    c.save();
+    roundedBox(c, x, y, w, h, r);
+    c.clip();
+    c.fillStyle = 'plum';
+    c.fillRect(x, y, w, 80);
+    c.restore();
+    c.fillStyle = 'black';
+    c.fillRect(x, y + 80, w, 8);
+    ['palevioletred', 'yellow', 'white'].forEach(function (color, i) {
+        c.beginPath();
+        c.arc(x + 50 + i * 40, y + 40, 12, 0, Math.PI * 2);
+        c.fillStyle = color;
+        c.fill();
+        c.lineWidth = 3;
+        c.strokeStyle = 'black';
+        c.stroke();
+    });
+    // likhai
+    c.textBaseline = 'middle';
+    c.textAlign = 'center';
+    c.fillStyle = 'palevioletred';
+    c.font = 'bold 50px system-ui, "Segoe UI", sans-serif';
+    c.fillText('happy birthday', W / 2, 340);
+
+    c.fillStyle = 'darkblue';
+    fitText(c, toName, 780, 130, 'bold');
+    c.fillText(toName, W / 2, 470);
+
+    drawWave(c, 160, 710, 760, 320);
+
+    c.fillStyle = 'black';
+    fitText(c, 'a mixtape from ' + fromName + ' 💗', 780, 46, 'bold');
+    c.fillText('a mixtape from ' + fromName + ' 💗', W / 2, 935);
+
+    // teen pixel dil
+    for (let i = 0; i < 3; i++) {
+        drawPixelHeart(c, W / 2 - 187 + i * 138, 990, 14);
+    }
+
+    c.fillStyle = 'gray';
+    c.font = '30px system-ui, "Segoe UI", sans-serif';
+    c.fillText('▶ press play on your friendship', W / 2, 1135);
+
+    // card ki kaali border sab se aakhir mein - taake upar rahe
+    roundedBox(c, x, y, w, h, r);
+    c.lineWidth = 8;
+    c.strokeStyle = 'black';
+    c.stroke();
+
+    // stickers - taare kono par chipke hue
+    drawStar(c, 850, 70, 190, 'yellow');
+    drawStar(c, 40, 1110, 150, 'blueviolet');
+
+    c.fillStyle = 'white';
+    c.font = 'bold 42px system-ui, "Segoe UI", sans-serif';
+    c.fillText('friendship mixtape', W / 2, 1275);
+}
+
+cardButton.addEventListener('click', function () {
+    if (fromName === '' || toName === '') return;
+    drawCard();
+    cardPopup.classList.remove('hidden');
+});
+cardClose.addEventListener('click', function () {
+    cardPopup.classList.add('hidden');
+});
