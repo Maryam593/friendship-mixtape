@@ -296,73 +296,60 @@ const cardPopup = document.querySelector('#card-popup');
 const cardCanvas = document.querySelector('#card-canvas');
 const cardClose = document.querySelector('#card-close');
 
-// gol kono wala dabba (canvas mein seedha border-radius nahi hota)
-function roundedBox(c, x, y, w, h, r) {
-    c.beginPath();
-    c.moveTo(x + r, y);
-    c.arcTo(x + w, y, x + w, y + h, r);
-    c.arcTo(x + w, y + h, x, y + h, r);
-    c.arcTo(x, y + h, x, y, r);
-    c.arcTo(x, y, x + w, y, r);
-    c.closePath();
-}
+// ---- black & white card ke rang ----
+const INK = '#ececec';          // safed (baja hua hissa, likhai)
+const SMOKE = '#7d7d7d';        // grey (abhi nahi baja)
 
-// wahi star jo CSS clip-path mein hai - % ko asal jagah mein badal kar
-const STAR_POINTS = [50,0, 57,23, 75,7, 70,30, 93,25, 77,43, 100,50, 77,57, 93,75, 70,70,
-    75,93, 57,77, 50,100, 43,77, 25,93, 30,70, 7,75, 23,57, 0,50, 23,43, 7,25, 30,30, 25,7, 43,23];
-function drawStar(c, x, y, size, color) {
-    c.beginPath();
-    for (let i = 0; i < STAR_POINTS.length; i += 2) {
-        c.lineTo(x + STAR_POINTS[i] / 100 * size, y + STAR_POINTS[i + 1] / 100 * size);
+// film jaisa grain - ek baar bana kar yaad rakho (har frame mein dobara banana mehnga hai)
+let grainCanvas = null;
+function getGrain(W, H) {
+    if (grainCanvas) return grainCanvas;
+    grainCanvas = document.createElement('canvas');
+    grainCanvas.width = W;
+    grainCanvas.height = H;
+    const g = grainCanvas.getContext('2d');
+    const image = g.createImageData(W, H);
+    for (let i = 0; i < image.data.length; i += 4) {
+        const shade = Math.random() * 255;
+        image.data[i] = image.data[i + 1] = image.data[i + 2] = shade;
+        image.data[i + 3] = Math.random() * 28;      // bohat halka - bas thori si "film" feel
     }
-    c.closePath();
-    c.fillStyle = color;
-    c.fill();
-    c.lineWidth = 5;
-    c.strokeStyle = 'black';
-    c.stroke();
+    g.putImageData(image, 0, 0);
+    return grainCanvas;
 }
 
 // lamba naam ho to font chhota karte jao jab tak jagah mein na aa jaye
-function fitText(c, text, maxWidth, size, weight) {
+function fitText(c, text, maxWidth, size, weight, spacing = 0) {
     do {
         c.font = weight + ' ' + size + 'px system-ui, "Segoe UI", sans-serif';
         size -= 4;
-    } while (c.measureText(text).width > maxWidth && size > 20);
+    } while (spacedWidth(c, text, spacing) > maxWidth && size > 20);
 }
 
-// pixel dil - wahi naqsha jo CSS box-shadow mein hai
-const HEART_MAP = [
-    '.XX.XX.',
-    'XXXXXXX',
-    'XXXXXXX',
-    '.XXXXX.',
-    '..XXX..',
-    '...X...',
-];
-function drawPixelHeart(c, x, y, pixel) {
-    // pehle kaala (thora bara) - outline, phir upar gulabi
-    [['black', 4], ['rgb(211, 41, 112)', 0]].forEach(function ([color, grow]) {
-        c.fillStyle = color;
-        HEART_MAP.forEach(function (row, r) {
-            [...row].forEach(function (cell, col) {
-                if (cell === 'X') {
-                    c.fillRect(x + col * pixel - grow, y + r * pixel - grow, pixel + grow * 2, pixel + grow * 2);
-                }
-            });
-        });
-    });
+// harfon ke beech jagah - "h a p p y" jaisa aesthetic look
+function spacedWidth(c, text, spacing) {
+    const letters = [...text];
+    return letters.reduce(function (sum, l) { return sum + c.measureText(l).width; }, 0) + spacing * (letters.length - 1);
+}
+function drawSpaced(c, text, centerX, y, spacing) {
+    let x = centerX - spacedWidth(c, text, spacing) / 2;
+    c.textAlign = 'left';
+    for (const letter of text) {
+        c.fillText(letter, x, y);
+        x += c.measureText(letter).width + spacing;
+    }
+    c.textAlign = 'center';
 }
 
 // sound wave: dono naamon ke sur -> lehar kahan oonchi, kahan neechi
-// progress: 0 se 1 - jitna gaana baj chuka utni lehar gehri gulabi, baqi halki
+// progress: 0 se 1 - jitna gaana baj chuka utni lehar safed, baqi grey
 function drawWave(c, x, centerY, width, height, progress) {
     const notes = nameToNotes(fromName + ' ' + toName, 0);
     const heights = notes.map(function (note) {
         return note === null ? 0.12 : 0.3 + (note / 21) * 0.7;   // space = choti lehar
     });
-    const cycles = 28;                     // kitni baar upar neeche ho
-    const wave = new Path2D();             // lehar ka raasta alag se yaad rakho - teen baar banana hai
+    const cycles = 24;                     // kitni baar upar neeche ho
+    const wave = new Path2D();             // lehar ka raasta alag se yaad rakho - do baar banana hai
     for (let px = 0; px <= width; px += 2) {
         const t = px / width;              // 0 se 1 tak - kitna aage aa gaye
         const spot = t * (heights.length - 1);
@@ -377,128 +364,121 @@ function drawWave(c, x, centerY, width, height, progress) {
     }
     c.lineCap = 'round';
     c.lineJoin = 'round';
-    c.strokeStyle = 'black';               // pehle moti kaali line (outline)
-    c.lineWidth = 18;
-    c.stroke(wave);
-    c.strokeStyle = '#f9d3e0';             // phir upar patli halki gulabi (abhi nahi baja)
     c.lineWidth = 9;
+    c.strokeStyle = SMOKE;                 // poori lehar grey
     c.stroke(wave);
-    // jitna baj chuka - sirf utne hisse mein gehri gulabi (clip = baqi hissa chhupa do)
+    // jitna baj chuka - sirf utne hisse mein safed (clip = baqi hissa chhupa do)
     c.save();
     c.beginPath();
     c.rect(x - 20, centerY - height, width * progress + 20, height * 2);
     c.clip();
-    c.strokeStyle = 'palevioletred';
+    c.strokeStyle = INK;
     c.stroke(wave);
     c.restore();
 }
 
-// card par chhota sa player wala progress bar
-function drawCardProgress(c, centerX, y, progress, label) {
-    const width = 600, left = centerX - width / 2;
-    roundedBox(c, left, y - 11, width, 22, 11);
-    c.fillStyle = 'white';
-    c.fill();
-    if (progress > 0) {
-        roundedBox(c, left, y - 11, Math.max(22, width * progress), 22, 11);
-        c.fillStyle = 'palevioletred';
-        c.fill();
-    }
-    roundedBox(c, left, y - 11, width, 22, 11);
-    c.lineWidth = 5;
-    c.strokeStyle = 'black';
-    c.stroke();
-    // gol dot
+// vinyl record - gaane ke saath ghoomta hai (angle radians mein)
+function drawVinyl(c, cx, cy, radius, angle) {
+    c.save();
+    c.translate(cx, cy);
+    c.rotate(angle);
+    // kaala record
     c.beginPath();
-    c.arc(left + width * progress, y, 20, 0, Math.PI * 2);
-    c.fillStyle = 'palevioletred';
+    c.arc(0, 0, radius, 0, Math.PI * 2);
+    c.fillStyle = '#0b0b0b';
     c.fill();
-    c.stroke();
-    c.fillStyle = 'gray';
-    c.font = 'bold 26px system-ui, "Segoe UI", sans-serif';
-    c.fillText(label, centerX, y + 48);
+    // grooves - bohat saare halke gol daire
+    c.lineWidth = 1.5;
+    for (let r = radius - 12; r > radius * 0.34; r -= 7) {
+        c.beginPath();
+        c.arc(0, 0, r, 0, Math.PI * 2);
+        c.strokeStyle = 'rgba(255, 255, 255, ' + (0.04 + (r % 3) * 0.015) + ')';
+        c.stroke();
+    }
+    // chamak - do halki tirchhi patti (ghoomne par nazar aata hai ke record chal raha hai)
+    [0, Math.PI].forEach(function (start) {
+        c.beginPath();
+        c.moveTo(0, 0);
+        c.arc(0, 0, radius - 10, start - 0.25, start + 0.25);
+        c.closePath();
+        c.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        c.fill();
+    });
+    // beech ka label + dost ka naam
+    c.beginPath();
+    c.arc(0, 0, radius * 0.3, 0, Math.PI * 2);
+    c.fillStyle = '#d6d6d6';
+    c.fill();
+    c.fillStyle = '#1a1a1a';
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    fitText(c, toName.toLowerCase(), radius * 0.45, 30, 'bold');
+    c.fillText(toName.toLowerCase(), 0, -radius * 0.1);
+    c.font = '18px system-ui, "Segoe UI", sans-serif';
+    c.fillText('side a', 0, radius * 0.12);
+    // beech ka chhed
+    c.beginPath();
+    c.arc(0, 0, 9, 0, Math.PI * 2);
+    c.fillStyle = '#0b0b0b';
+    c.fill();
+    c.restore();
 }
 
-// progress: kitna gaana baj chuka (0 se 1). label: progress bar ke neeche likhai
-function drawCard(progress = 0, label = 'tap the card to play ▶') {
+// patli si progress line + waqt
+function drawCardProgress(c, centerX, y, progress, label) {
+    const width = 560, left = centerX - width / 2;
+    c.lineCap = 'round';
+    c.lineWidth = 4;
+    c.strokeStyle = SMOKE;
+    c.beginPath(); c.moveTo(left, y); c.lineTo(left + width, y); c.stroke();
+    c.strokeStyle = INK;
+    c.beginPath(); c.moveTo(left, y); c.lineTo(left + width * progress, y); c.stroke();
+    c.beginPath();
+    c.arc(left + width * progress, y, 9, 0, Math.PI * 2);
+    c.fillStyle = INK;
+    c.fill();
+    c.fillStyle = SMOKE;
+    c.font = '24px system-ui, "Segoe UI", sans-serif';
+    drawSpaced(c, label, centerX, y + 40, 2);
+}
+
+// progress: kitna gaana baj chuka (0 se 1). label: progress ke neeche likhai. seconds: record ghumane ke liye
+function drawCard(progress = 0, label = 'tap the card to play ▶', seconds = 0) {
     const c = cardCanvas.getContext('2d');
     const W = cardCanvas.width;            // 1080
     const H = cardCanvas.height;           // 1350
 
-    // gulabi background + grid
-    c.fillStyle = 'palevioletred';
+    // dhundla kaala background - beech mein thora roshan, kinaron par gehra
+    const light = c.createRadialGradient(W * 0.45, H * 0.35, 50, W / 2, H / 2, H * 0.8);
+    light.addColorStop(0, '#3a3a3a');
+    light.addColorStop(1, '#0a0a0a');
+    c.fillStyle = light;
     c.fillRect(0, 0, W, H);
-    c.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-    c.lineWidth = 2;
-    for (let i = 0; i <= Math.max(W, H); i += 45) {
-        c.beginPath(); c.moveTo(i, 0); c.lineTo(i, H); c.stroke();
-        c.beginPath(); c.moveTo(0, i); c.lineTo(W, i); c.stroke();
-    }
 
-    // card ka dabba - pehle saya, phir safed
-    const x = 90, y = 170, w = 900, h = 1010, r = 30;
-    roundedBox(c, x + 14, y + 14, w, h, r);
-    c.fillStyle = 'black';
-    c.fill();
-    roundedBox(c, x, y, w, h, r);
-    c.fillStyle = 'white';
-    c.fill();
+    drawWave(c, 110, 400, 860, 380, progress);
 
-    // title bar (card ke andar hi rahe - clip)
-    c.save();
-    roundedBox(c, x, y, w, h, r);
-    c.clip();
-    c.fillStyle = 'plum';
-    c.fillRect(x, y, w, 80);
-    c.restore();
-    c.fillStyle = 'black';
-    c.fillRect(x, y + 80, w, 8);
-    ['palevioletred', 'yellow', 'white'].forEach(function (color, i) {
-        c.beginPath();
-        c.arc(x + 50 + i * 40, y + 40, 12, 0, Math.PI * 2);
-        c.fillStyle = color;
-        c.fill();
-        c.lineWidth = 3;
-        c.strokeStyle = 'black';
-        c.stroke();
-    });
-    // likhai
+    // likhai - phaile hue harf
     c.textBaseline = 'middle';
     c.textAlign = 'center';
-    c.fillStyle = 'palevioletred';
-    c.font = 'bold 50px system-ui, "Segoe UI", sans-serif';
-    c.fillText('happy birthday', W / 2, 340);
+    c.fillStyle = INK;
+    c.font = '52px system-ui, "Segoe UI", sans-serif';
+    drawSpaced(c, 'happy birthday', W / 2, 700, 20);
+    const name = toName.toLowerCase();
+    fitText(c, name, 900, 84, 'bold', 24);
+    drawSpaced(c, name, W / 2, 795, 24);
 
-    c.fillStyle = 'darkblue';
-    fitText(c, toName, 780, 130, 'bold');
-    c.fillText(toName, W / 2, 470);
+    drawCardProgress(c, W / 2, 888, progress, label);
 
-    drawWave(c, 160, 705, 760, 320, progress);
+    // record kone mein - aadha bahar. 33 chakkar fi minute = 0.55 chakkar fi second
+    drawVinyl(c, 880, 1275, 340, seconds * 0.55 * Math.PI * 2);
 
-    c.fillStyle = 'black';
-    fitText(c, 'a mixtape from ' + fromName + ' 💗', 780, 46, 'bold');
-    c.fillText('a mixtape from ' + fromName + ' 💗', W / 2, 935);
+    // tumhara naam watermark ki tarah, record ke upar halka sa
+    c.fillStyle = 'rgba(255, 255, 255, 0.38)';
+    fitText(c, 'from ' + fromName.toLowerCase(), 620, 62, 'bold');
+    c.fillText('from ' + fromName.toLowerCase(), W * 0.4, 1150);
 
-    // teen pixel dil
-    for (let i = 0; i < 3; i++) {
-        drawPixelHeart(c, W / 2 - 187 + i * 138, 975, 13);
-    }
-
-    drawCardProgress(c, W / 2, 1093, progress, label);
-
-    // card ki kaali border sab se aakhir mein - taake upar rahe
-    roundedBox(c, x, y, w, h, r);
-    c.lineWidth = 8;
-    c.strokeStyle = 'black';
-    c.stroke();
-
-    // stickers - taare kono par chipke hue
-    drawStar(c, 850, 70, 190, 'yellow');
-    drawStar(c, 40, 1110, 150, 'blueviolet');
-
-    c.fillStyle = 'white';
-    c.font = 'bold 42px system-ui, "Segoe UI", sans-serif';
-    c.fillText('friendship mixtape', W / 2, 1275);
+    // grain sab se upar
+    c.drawImage(getGrain(W, H), 0, 0);
 }
 
 // ---------- card ka gaana: card par click = bajao, download = video (tasveer + awaaz) ----------
@@ -584,7 +564,7 @@ function playCard(record) {
     session.timer = setInterval(function () {
         const t = audioCtx.currentTime - start;
         const progress = Math.min(1, Math.max(0, t / duration));
-        drawCard(progress, formatTime(t) + ' / ' + formatTime(duration));
+        drawCard(progress, formatTime(t) + ' / ' + formatTime(duration), Math.max(0, t));
         if (t >= duration + 0.3) {
             clearInterval(session.timer);
             if (session.recorder) session.recorder.stop();
