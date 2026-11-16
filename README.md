@@ -2,6 +2,8 @@
 
 > A cute, doodle-style birthday mixtape made with plain **HTML + CSS + JS**. Type your name and your friend's name, and the page composes a little song from both names. 🎀
 
+**🌐 Try it live:** [friendship-mixtape.vercel.app](https://friendship-mixtape.vercel.app)
+
 ![design inspiration](doodle.PNG)
 
 ---
