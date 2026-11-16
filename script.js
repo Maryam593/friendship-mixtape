@@ -114,37 +114,53 @@ function toFreq(semitones) {
 // mixtape mein 3 tracks - har ek dono naamon se, magar alag andaaz mein
 const TRACK_COUNT = 3;
 
+// gaanon wale chords: C -> G -> Am -> F (bohat saare pop gaane yahi chalate hain)
+// har chord ke teen sur (C4 se kitne semitone door)
+const CHORDS = [
+    [0, 4, 7],      // C  (Sa Ga Pa)
+    [-5, -1, 2],    // G
+    [-3, 0, 4],     // Am
+    [-7, -3, 0],    // F
+];
+
+// layer ki settings:
+// type = awaaz ki shape, volume, every = kitne steps baad baje,
+// ring = sur kitni der goonje (step ke hisaab se), attack = kitni dheere shuru ho (second)
+// shimmer = ek octave upar halki si "ghanti" (music box jaisi chamak)
 function makeTrack(index) {
     if (index === 0) {
-        // track 1: tumhara naam = upar wali dhun, dost ka naam = neeche wala bass
+        // track 1: tumhara naam = music box jaisi dhun, dost ka naam = neeche naram awaaz
         return {
             layers: [
-                { notes: nameToNotes(fromName, 1), type: 'square', volume: 0.07, every: 1 },
-                { notes: nameToNotes(toName, -1), type: 'triangle', volume: 0.25, every: 2 },
+                { notes: nameToNotes(fromName, 1), type: 'triangle', volume: 0.12, every: 1, ring: 2.5, attack: 0.005, shimmer: true },
+                { notes: nameToNotes(toName, -1), type: 'sine', volume: 0.12, every: 2, ring: 1.8, attack: 0.02 },
             ],
-            stepTime: 0.25,    // har step kitne second ka
+            stepTime: 0.3,     // har step kitne second ka
+            barSteps: 8,       // har 8 steps par naya chord
             length: 64,        // kitne steps ka gaana
         };
     }
     if (index === 1) {
-        // track 2: ulta - dost ki dhun upar, tumhara bass neeche, thora tez
+        // track 2: ulta - dost ki dhun upar, tumhari neeche, thora tez
         return {
             layers: [
-                { notes: nameToNotes(toName, 1), type: 'square', volume: 0.07, every: 1 },
-                { notes: nameToNotes(fromName, -1), type: 'triangle', volume: 0.25, every: 2 },
+                { notes: nameToNotes(toName, 1), type: 'triangle', volume: 0.12, every: 1, ring: 2.5, attack: 0.005, shimmer: true },
+                { notes: nameToNotes(fromName, -1), type: 'sine', volume: 0.12, every: 2, ring: 1.8, attack: 0.02 },
             ],
-            stepTime: 0.2,
+            stepTime: 0.27,
+            barSteps: 8,
             length: 64,
         };
     }
-    // track 3: lori (lullaby) - dono naam ek saath, naram sine awaaz, dheere
+    // track 3: lori (lullaby) - dono naam ek saath, sirf naram sine, dheere
     const together = fromName + ' ' + toName;
     return {
         layers: [
-            { notes: nameToNotes(together, 1), type: 'sine', volume: 0.18, every: 1 },
-            { notes: nameToNotes(together, -1).reverse(), type: 'triangle', volume: 0.2, every: 4 },
+            { notes: nameToNotes(together, 1), type: 'sine', volume: 0.16, every: 1, ring: 3, attack: 0.03, shimmer: true },
+            { notes: nameToNotes(together, -1).reverse(), type: 'sine', volume: 0.1, every: 4, ring: 3, attack: 0.1 },
         ],
-        stepTime: 0.35,
+        stepTime: 0.4,
+        barSteps: 8,
         length: 48,
     };
 }
@@ -168,23 +184,58 @@ let currentStep = 0;
 let nextStepTime = 0;      // agla step kis waqt bajna hai (audio ki ghari mein)
 let timerId = null;
 
+let output = null;         // aakhri awaaz (filter + goonj ke baad) - speaker aur video dono yahin se
+
+// goonj (reverb) ke liye "kamre ki awaaz" banao: shor jo dheere dheere khatam ho
+function makeRoom(seconds) {
+    const length = audioCtx.sampleRate * seconds;
+    const room = audioCtx.createBuffer(2, length, audioCtx.sampleRate);
+    for (let side = 0; side < 2; side++) {
+        const data = room.getChannelData(side);
+        for (let i = 0; i < length; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 3);
+        }
+    }
+    return room;
+}
+
+// awaaz ka raasta:
+// sur -> master -> filter (tez awaaz kaato) -> seedha output
+//                                      \-> goonj (reverb) -> output
 function setupAudio() {
     if (audioCtx) return;  // pehle se bana hai to dobara nahi
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     master = audioCtx.createGain();
     master.gain.value = 0.6;
-    master.connect(audioCtx.destination);
+
+    const soft = audioCtx.createBiquadFilter();
+    soft.type = 'lowpass';             // sirf neechi (naram) frequencies guzarne do
+    soft.frequency.value = 2200;
+
+    const reverb = audioCtx.createConvolver();
+    reverb.buffer = makeRoom(2.5);
+    const reverbVolume = audioCtx.createGain();
+    reverbVolume.gain.value = 0.35;
+
+    output = audioCtx.createGain();
+    master.connect(soft);
+    soft.connect(output);
+    soft.connect(reverb);
+    reverb.connect(reverbVolume);
+    reverbVolume.connect(output);
+    output.connect(audioCtx.destination);
 }
 
-// ek sur bajao: oscillator (taar) -> gain (volume) -> master -> speaker
-function playNote(freq, time, duration, type, volume) {
+// ek sur bajao: oscillator (taar) -> gain (volume) -> master
+// attack: kitni dheere shuru ho. duration: kab tak goonj kar khatam ho
+function playNote(freq, time, duration, type, volume, attack = 0.01) {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = type;
     osc.frequency.value = freq;
     // dheere se shuru aur dheere se band - warna "tik" ki awaaz aati hai
     gain.gain.setValueAtTime(0.0001, time);
-    gain.gain.exponentialRampToValueAtTime(volume, time + 0.01);
+    gain.gain.exponentialRampToValueAtTime(volume, time + attack);
     gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
     osc.connect(gain);
     gain.connect(master);
@@ -193,16 +244,38 @@ function playNote(freq, time, duration, type, volume) {
     return osc;            // card wala gaana beech mein rokna ho to kaam aaye
 }
 
+// F chord ke saath E (Ga) thora takrata hai - us waqt F bajao
+function fitToChord(note, chord) {
+    const isF = chord === CHORDS[3];
+    return isF && ((note % 12) + 12) % 12 === 4 ? note + 1 : note;
+}
+
 // ek step par har layer ka sur bajao
 // (whichTrack: kaun sa gaana - player ka ya card ka. bounce: pixel dil uchhlein ya nahi)
 function playStep(step, time, whichTrack = track, bounce = true) {
     const played = [];
+    const bar = whichTrack.stepTime * whichTrack.barSteps;           // ek chord kitni der
+    const chord = CHORDS[Math.floor(step / whichTrack.barSteps) % CHORDS.length];
+
+    // har naye chord par: naram pad (teeno sur) + neeche gehra bass
+    if (step % whichTrack.barSteps === 0) {
+        chord.forEach(function (note) {
+            played.push(playNote(toFreq(note), time, bar * 1.1, 'triangle', 0.035, 0.5));
+        });
+        played.push(playNote(toFreq(chord[0] - 24), time, bar, 'sine', 0.2, 0.05));
+    }
+
     whichTrack.layers.forEach(function (layer, layerNumber) {
-        if (step % layer.every !== 0) return;     // bass har doosre step par
+        if (step % layer.every !== 0) return;     // neeche wali dhun har doosre step par
         const index = Math.floor(step / layer.every) % layer.notes.length;  // chhota naam dobara se (loop)
-        const note = layer.notes[index];
-        if (note === null) return;                // khamoshi
-        played.push(playNote(toFreq(note), time, whichTrack.stepTime * layer.every * 0.9, layer.type, layer.volume));
+        const raw = layer.notes[index];
+        if (raw === null) return;                 // khamoshi
+        const note = fitToChord(raw, chord);
+        const ring = whichTrack.stepTime * layer.every * layer.ring;
+        played.push(playNote(toFreq(note), time, ring, layer.type, layer.volume, layer.attack));
+        if (layer.shimmer) {
+            played.push(playNote(toFreq(note + 12), time, ring * 0.6, 'sine', layer.volume * 0.25, layer.attack));
+        }
         if (bounce && layerNumber === 0) {
             bounceHeart(step % pixelHearts.length, time);   // upar wali dhun ke har sur par ek dil uchhle
         }
@@ -533,7 +606,7 @@ function playCard(record) {
         const soundOut = audioCtx.createMediaStreamDestination();
         const louder = audioCtx.createGain();   // video mein awaaz thori oonchi (phone par dheemi lagti thi)
         louder.gain.value = 2;
-        master.connect(louder);
+        output.connect(louder);
         louder.connect(soundOut);
         const stream = new MediaStream([
             ...cardCanvas.captureStream(30).getVideoTracks(),
@@ -546,7 +619,7 @@ function playCard(record) {
             if (event.data.size > 0) pieces.push(event.data);
         };
         recorder.onstop = function () {
-            master.disconnect(louder);
+            output.disconnect(louder);
             stream.getTracks().forEach(function (t) { t.stop(); });
             cardDownload.disabled = false;
             cardDownload.textContent = DOWNLOAD_TEXT;
