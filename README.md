@@ -32,7 +32,7 @@ There are no mp3 files. Every sound is made live by the browser's **Web Audio AP
 
 ## 🔗 Send it to a friend
 
-After you make a mixtape, the link holds both names, like `index.html?from=Maryam&to=Ayesha`.
+After you make a mixtape, the link holds both names, like `index.html?from=Ali&to=Sara`.
 Press **copy link to send**, share it, and your friend lands straight on their birthday message. 🎁
 
 ## 🚧 Coming soon
