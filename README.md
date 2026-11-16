@@ -21,14 +21,19 @@
 | 👾 **Pixel hearts** | Pixel art drawn with one tiny box and 27 `box-shadow` copies, bouncing on every note |
 | 🎂 **Birthday card** | Asks for both names, then shows a Happy Birthday message |
 
+## 🌍 Three languages
+
+Switch between **English**, **اردو** and **Türkçe** with the button in the top corner. Every screen changes, even the video card. Urdu is written right to left in a Nastaliq font. The chosen language also goes into the share link (`&lang=ur`), so your friend opens it in the same language.
+
 ## 🎹 How the music works
 
 There are no mp3 files. Every sound is made live by the browser's **Web Audio API**:
 
 1. Each letter of a name becomes a number (`a` = 97...), and that number picks a note from a **pentatonic scale** (C D E G A), so every name sounds sweet.
-2. **Your name** plays the melody (a `square` wave, very 8-bit 👾) and **your friend's name** plays the bass (a `triangle` wave).
-3. Spaces become little rests. The shorter name loops so both layers play together.
-4. Same names = the same song every time. It's *your* friendship's song 💗
+2. **Your name** plays a soft music-box melody (`triangle` + `sine` waves) and **your friend's name** plays a gentle low line.
+3. Underneath, soft chords go **C → G → Am → F** (like lots of pop songs), with a deep bass and a little **reverb** so it sounds like a room.
+4. Spaces become little rests. The shorter name loops so both layers play together.
+5. Same names = the same song every time. It's *your* friendship's song 💗
 
 ## 🔗 Send it to a friend
 
