@@ -39,7 +39,7 @@ Press **copy link to send**, share it, and your friend lands straight on their b
 
 Press **get your card 💿** under the player:
 
-- **Tap the card** to play its song right there. The sound wave fills up with pink as the song plays.
+- **Tap the card** to play its song right there. The black & white sound wave turns white as the song plays, and the vinyl spins.
 - **download video 🎬** records the card with its song (about 16 seconds) and saves it as an `.mp4` (or `.webm` on some browsers).
 - It's sized 1080×1350, ready for WhatsApp, Instagram or a story. Your friend taps it and hears their song. 💗
 - Keep the tab open while it records!
