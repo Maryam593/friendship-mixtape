@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <!-- Urdu ke liye Nastaliq font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap">
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
@@ -273,7 +277,7 @@
             </div>
           </div>
         <!-- music card button - player ke neeche -->
-        <button type="button" class="card-button" id="card-button">get your card 💿</button>
+        <button type="button" class="card-button" id="card-button" data-i18n="getCard">get your card 💿</button>
 
         <!-- music card - preview aur download -->
         <div class="intro hidden" id="card-popup">
@@ -294,6 +298,13 @@
             </div>
         </div>
 
+        <!-- zaban badlo - sab ke upar, kone mein -->
+        <div class="lang-switch" id="lang-switch">
+            <button type="button" data-lang="en">EN</button>
+            <button type="button" data-lang="ur">اردو</button>
+            <button type="button" data-lang="tr">TR</button>
+        </div>
+
         <!-- intro - naam pucho, phir birthday message (sab ke upar) -->
         <div class="intro" id="intro">
             <div class="intro-card">
@@ -308,19 +319,19 @@
                 <div class="intro-body">
                     <!-- screen 1: naam -->
                     <form class="name-step" id="name-step">
-                        <h2>make a mixtape 💿</h2>
-                        <label for="from-name">your name</label>
+                        <h2 data-i18n="makeTitle">make a mixtape 💿</h2>
+                        <label for="from-name" data-i18n="yourName">your name</label>
                         <input type="text" id="from-name" maxlength="20" autocomplete="off">
-                        <label for="to-name">your friend's name</label>
+                        <label for="to-name" data-i18n="friendName">your friend's name</label>
                         <input type="text" id="to-name" maxlength="20" autocomplete="off">
                         <p class="intro-error" id="intro-error"></p>
-                        <button type="submit" class="intro-button">make my mixtape</button>
+                        <button type="submit" class="intro-button" data-i18n="makeButton">make my mixtape</button>
                     </form>
                     <!-- screen 2: birthday message -->
                     <div class="message-step hidden" id="message-step">
-                        <h2>Happy Birthday <span id="msg-to"></span>! 🎂</h2>
-                        <p><span id="msg-from"></span> made you a mixtape 💗<br>please listen</p>
-                        <button type="button" class="intro-button" id="listen-button">listen ▶</button>
+                        <h2><span data-i18n="happyBirthday">Happy Birthday</span> <span id="msg-to"></span>! 🎂</h2>
+                        <p><span id="msg-from"></span> <span data-i18n="madeYou">made you a mixtape 💗</span><br><span data-i18n="pleaseListen">please listen</span></p>
+                        <button type="button" class="intro-button" id="listen-button" data-i18n="listen">listen ▶</button>
                         <button type="button" class="copy-link" id="copy-link">copy link to send 🔗</button>
                     </div>
                 </div>

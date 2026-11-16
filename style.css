@@ -516,7 +516,7 @@ html, body {
 .name-step{
     display: flex;
     flex-direction: column;
-    text-align: left;
+    text-align: start;               /* English mein left, Urdu mein right */
 }
 .name-step label{
     font-weight: bold;
@@ -770,4 +770,51 @@ html, body {
         bottom: 25px;
         left: 72%;
     }
+}
+
+/* ---------- zaban badalne wala button (kone mein, sab ke upar) ---------- */
+.lang-switch{
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 200;                     /* intro aur card popup ke bhi upar */
+    display: flex;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 20px;
+    box-shadow: 2px 2px 0 black;
+    overflow: hidden;
+}
+.lang-switch button{
+    font: inherit;
+    font-size: 13px;
+    font-weight: bold;
+    background: none;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+.lang-switch button + button{
+    border-left: 2px solid black;     /* buttons ke beech line */
+}
+.lang-switch button.active{
+    background-color: yellow;
+}
+.lang-switch button[data-lang="ur"]{
+    font-family: "Noto Nastaliq Urdu", system-ui, sans-serif;
+    font-size: 12px;
+    line-height: 1;
+}
+/* Urdu: Nastaliq font - is ke harf oonche hote hain, isliye line-height zyada */
+.lang-ur .intro-body,
+.lang-ur .card-button{
+    font-family: "Noto Nastaliq Urdu", system-ui, sans-serif;
+    line-height: 2;
+}
+.lang-ur .intro-body h2{
+    font-weight: 700;
+    line-height: 2.2;
+}
+.lang-ur .message-step p{
+    font-size: 15px;                  /* Nastaliq bara hota hai - line na toote */
 }
