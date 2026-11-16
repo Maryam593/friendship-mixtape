@@ -508,6 +508,18 @@ openPlayerButton.addEventListener('click', function () {
     openPlayerButton.classList.add('hidden');
 });
 
+// mini window (pixel dil) ka x : window band, "show hearts" button dikhao
+const pixelWindow = document.querySelector('.pixel-player');
+const openHeartsButton = document.querySelector('#open-hearts');
+document.querySelector('#mini-close').addEventListener('click', function () {
+    pixelWindow.classList.add('closed');
+    openHeartsButton.classList.remove('hidden');
+});
+openHeartsButton.addEventListener('click', function () {
+    pixelWindow.classList.remove('closed');
+    openHeartsButton.classList.add('hidden');
+});
+
 // ---------- music card: naamon ki dhun se bani tasveer (canvas) ----------
 const cardButton = document.querySelector('#card-button');
 const cardPopup = document.querySelector('#card-popup');

@@ -491,8 +491,43 @@ html, body {
     border-bottom: 3px solid black;
 }
 .mini-close{
+    font: inherit;
     font-size: 14px;
     font-weight: bold;
+    color: black;
+    background: none;
+    border: none;
+    padding: 0 2px;
+    line-height: 1;
+    cursor: pointer;
+}
+.mini-close:hover{
+    transform: scale(1.3);
+}
+/* x : mini window band */
+.pixel-player.closed{
+    display: none;
+}
+/* band mini window ki jagah chhota sa button */
+.open-hearts{
+    position: absolute;
+    top: 62%;
+    left: 72%;
+    z-index: 10;
+    font: inherit;
+    font-weight: bold;
+    background-color: pink;
+    border: 3px solid black;
+    border-radius: 20px;
+    box-shadow: 3px 3px 0 black;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+.open-hearts:hover{
+    transform: scale(1.05);
+}
+.open-hearts.hidden{
+    display: none;
 }
 /* pixel dil - asal dabba sirf 1 pixel (5x5), baqi saare pixel box-shadow ke saaye hain */
 .pixel-heart{
@@ -762,7 +797,15 @@ html, body {
         transform-origin: top center;
     }
     .card-button{ grid-row: 2; }
-    .pixel-player{ grid-row: 4; }
+    .pixel-player,
+    .open-hearts{ grid-row: 4; }
+    .open-hearts{
+        position: relative;
+        top: auto;
+        left: auto;
+        grid-column: 1 / -1;
+        justify-self: center;
+    }
     .player{
         position: relative;
         top: auto;

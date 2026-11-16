@@ -49,7 +49,7 @@ Press **get your card 💿** under the player:
 
 ## 🚧 Coming soon
 
-- [x] `_ □ x` window buttons that actually work (minimize, maximize, close)
+- [x] `_ □ x` window buttons that actually work (minimize, maximize, close), and the mini window closes too
 - [x] Looks nice on phones too (responsive)
 - [ ] Star outlines
 
