@@ -24,6 +24,7 @@
 | 💌 **Heart bubble** | A heart made from two circles and a rotated square |
 | 👾 **Pixel hearts** | Pixel art drawn with one tiny box and 27 `box-shadow` copies, bouncing on every note |
 | 🎂 **Birthday card** | Asks for both names, then shows a Happy Birthday message |
+| 💿 **Video music card** | A black & white card with a sound wave and a vinyl that plays the song and downloads as a video |
 
 ## 🎹 How the music works
 
@@ -45,6 +46,12 @@ Press **copy link to send**, share it, and your friend lands straight on their b
 ## 🎬 Video music card
 
 Press **get your card 💿** under the player:
+
+<p align="center">
+  <img src="screenshots/music-card.jpg" alt="Black and white music card with a sound wave, happy birthday sara, and a spinning vinyl" width="300">
+  &nbsp;
+  <img src="screenshots/card-popup.png" alt="The card window with track buttons and a download video button" width="480">
+</p>
 
 - **Tap the card** to play its song right there. The black & white sound wave turns white as the song plays, and the vinyl spins.
 - Pick **which track** to use: side a, side b or the lullaby.
