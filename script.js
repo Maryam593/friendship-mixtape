@@ -233,6 +233,8 @@ function makeTrack(index) {
             layers: [
                 { notes: nameToNotes(fromName, 1), type: 'triangle', volume: 0.12, every: 1, ring: 2.5, attack: 0.005, shimmer: true },
                 { notes: nameToNotes(toName, -1), type: 'sine', volume: 0.12, every: 2, ring: 1.8, attack: 0.02 },
+                // awaaz: dost ka naam gaati hai - uske naam ke vowels mein
+                { notes: nameToNotes(toName, 0), vowels: nameToVowels(toName), voice: true, volume: 0.5, every: 2, ring: 0.95 },
             ],
             stepTime: 0.3,     // har step kitne second ka
             barSteps: 8,       // har 8 steps par naya chord
@@ -245,6 +247,8 @@ function makeTrack(index) {
             layers: [
                 { notes: nameToNotes(toName, 1), type: 'triangle', volume: 0.12, every: 1, ring: 2.5, attack: 0.005, shimmer: true },
                 { notes: nameToNotes(fromName, -1), type: 'sine', volume: 0.12, every: 2, ring: 1.8, attack: 0.02 },
+                // awaaz: is baar tumhara naam
+                { notes: nameToNotes(fromName, 0), vowels: nameToVowels(fromName), voice: true, volume: 0.5, every: 2, ring: 0.95 },
             ],
             stepTime: 0.27,
             barSteps: 8,
@@ -257,6 +261,8 @@ function makeTrack(index) {
         layers: [
             { notes: nameToNotes(together, 1), type: 'sine', volume: 0.16, every: 1, ring: 3, attack: 0.03, shimmer: true },
             { notes: nameToNotes(together, -1).reverse(), type: 'sine', volume: 0.1, every: 4, ring: 3, attack: 0.1 },
+            // lori mein awaaz sirf naram "oooh" gungunati hai
+            { notes: nameToNotes(together, 0), vowels: ['u'], voice: true, volume: 0.4, every: 4, ring: 0.95 },
         ],
         stepTime: 0.4,
         barSteps: 8,
@@ -343,6 +349,77 @@ function playNote(freq, time, duration, type, volume, attack = 0.01) {
     return osc;            // card wala gaana beech mein rokna ho to kaam aaye
 }
 
+// ---------- vocals: tone se gaana (formant synthesis) ----------
+// insaan ki awaaz = gale ki bhinbhinahat + munh ki shape.
+// munh ki har shape (aa, ee, oo) kuch khaas frequencies ko ubhaarti hai - inhein "formant" kehte hain
+const VOWELS = {
+    a: [800, 1150, 2900],     // "aa"
+    e: [400, 1700, 2600],     // "ee" (jaise "le")
+    i: [300, 2200, 3000],     // "ii"
+    o: [450, 800, 2830],      // "oo" (jaise "ko")
+    u: [325, 700, 2530],      // "uu"
+};
+const FORMANT_LOUDNESS = [1, 0.5, 0.2];   // pehla formant sab se tez
+const FORMANT_WIDTH = [80, 90, 120];      // har formant kitna chaura (Hz)
+
+// naam ke harf -> kaun sa vowel gaana hai (English, Turkish aur Urdu harf)
+const VOWEL_OF = {
+    a: 'a', e: 'e', i: 'i', y: 'i', o: 'o', u: 'u', w: 'u',
+    ı: 'u', ö: 'o', ü: 'u', â: 'a', î: 'i', û: 'u',
+    'ا': 'a', 'آ': 'a', 'ع': 'a', 'ہ': 'a', 'ة': 'a',
+    'ی': 'i', 'ي': 'i', 'ئ': 'e', 'ے': 'e', 'و': 'o', 'ؤ': 'o',
+};
+function nameToVowels(name) {
+    const vowels = [];
+    for (const letter of name.toLowerCase()) {
+        if (VOWEL_OF[letter]) vowels.push(VOWEL_OF[letter]);
+    }
+    return vowels.length > 0 ? vowels : ['a'];   // koi vowel na mile to "aa"
+}
+
+// ek sur gaao: sawtooth (bhinbhinahat) -> 3 formant filters (munh) -> master
+function playVoice(freq, time, duration, vowel, volume) {
+    const source = audioCtx.createOscillator();
+    source.type = 'sawtooth';
+    source.frequency.value = freq;
+
+    // vibrato: ek dheema oscillator jo pitch ko halka sa upar neeche kare - thori der baad shuru
+    const wobble = audioCtx.createOscillator();
+    wobble.frequency.value = 5.5;                      // 5.5 baar fi second
+    const wobbleAmount = audioCtx.createGain();
+    wobbleAmount.gain.setValueAtTime(0, time);
+    wobbleAmount.gain.linearRampToValueAtTime(freq * 0.012, time + 0.3);
+    wobble.connect(wobbleAmount);
+    wobbleAmount.connect(source.frequency);
+
+    // awaaz ka volume: naram shuru, thehri rahe, naram khatam
+    const voice = audioCtx.createGain();
+    voice.gain.setValueAtTime(0.0001, time);
+    voice.gain.exponentialRampToValueAtTime(volume, time + 0.08);
+    voice.gain.setValueAtTime(volume, time + Math.max(0.1, duration - 0.15));
+    voice.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+
+    // munh ki shape - teen filter ek saath
+    VOWELS[vowel].forEach(function (formant, i) {
+        const band = audioCtx.createBiquadFilter();
+        band.type = 'bandpass';
+        band.frequency.value = formant;
+        band.Q.value = formant / FORMANT_WIDTH[i];
+        const loudness = audioCtx.createGain();
+        loudness.gain.value = FORMANT_LOUDNESS[i];
+        source.connect(band);
+        band.connect(loudness);
+        loudness.connect(voice);
+    });
+    voice.connect(master);
+
+    source.start(time);
+    wobble.start(time);
+    source.stop(time + duration + 0.05);
+    wobble.stop(time + duration + 0.05);
+    return [source, wobble];
+}
+
 // F chord ke saath E (Ga) thora takrata hai - us waqt F bajao
 function fitToChord(note, chord) {
     const isF = chord === CHORDS[3];
@@ -371,6 +448,12 @@ function playStep(step, time, whichTrack = track, bounce = true) {
         if (raw === null) return;                 // khamoshi
         const note = fitToChord(raw, chord);
         const ring = whichTrack.stepTime * layer.every * layer.ring;
+        if (layer.voice) {
+            if (step % (whichTrack.barSteps * 2) >= whichTrack.barSteps * 1.5) return;   // har do bar ke aakhir mein saans lo
+            const vowel = layer.vowels[Math.floor(step / layer.every) % layer.vowels.length];
+            played.push(...playVoice(toFreq(note), time, ring, vowel, layer.volume));
+            return;
+        }
         played.push(playNote(toFreq(note), time, ring, layer.type, layer.volume, layer.attack));
         if (layer.shimmer) {
             played.push(playNote(toFreq(note + 12), time, ring * 0.6, 'sine', layer.volume * 0.25, layer.attack));
@@ -717,7 +800,7 @@ function playCard(record) {
     const start = audioCtx.currentTime + 0.4;  // thora ruk kar shuru - video ka pehla frame saaf aaye
     const session = { notes: [], recorder: null, timer: null, cancelled: false };
 
-    // poore gaane ke sur ek saath tay kar do (sirf 16 second ka hai)
+    // poore gaane ke sur ek saath tay kar do (sirf 20 second ka hai)
     for (let step = 0; step < cardTrack.length; step++) {
         session.notes.push(...playStep(step, start + step * cardTrack.stepTime, cardTrack, false));
     }
@@ -791,28 +874,6 @@ cardButton.addEventListener('click', async function () {
     }
     drawCard();
     cardPopup.classList.remove('hidden');
-});
-cardClose.addEventListener('click', function () {
-    stopCard();
-    cardPopup.classList.add('hidden');
-});
-
-// card par click: chal raha hai to roko, warna bajao (video ban rahi ho to kuch nahi)
-cardCanvas.addEventListener('click', function () {
-    if (cardSession && cardSession.recorder) return;
-    if (cardSession) {
-        stopCard();
-    } else {
-        playCard(false);
-    }
-});
-
-cardDownload.addEventListener('click', function () {
-    if (typeof MediaRecorder === 'undefined') {
-        cardDownload.textContent = t('noVideo');
-        return;
-    }
-    playCard(true);
 });
 
 // ---------- zaban lagao: har [data-i18n] wali cheez ki likhai badlo ----------
