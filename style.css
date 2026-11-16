@@ -440,6 +440,33 @@ html, body {
     font-size: 14px;
     font-weight: bold;
 }
+/* pixel dil - asal dabba sirf 1 pixel (5x5), baqi saare pixel box-shadow ke saaye hain */
+.pixel-heart{
+    width: 5px;
+    height: 5px;
+    background-color: transparent;   /* top-left khana dil mein khaali hai */
+    margin-right: 30px;              /* saaye jagah nahi lete - dil poora 35x30 hai, */
+    margin-bottom: 25px;             /* isliye itni jagah khud rakh di taake beech mein rahe */
+    box-shadow:
+        /* row 0 */
+        5px 0 0 rgb(211, 41, 112), 10px 0 0 rgb(211, 41, 112), 20px 0 0 rgb(211, 41, 112), 25px 0 0 rgb(211, 41, 112),
+        /* row 1 */
+        0 5px 0 rgb(211, 41, 112), 5px 5px 0 rgb(211, 41, 112), 10px 5px 0 rgb(211, 41, 112), 15px 5px 0 rgb(211, 41, 112), 20px 5px 0 rgb(211, 41, 112), 25px 5px 0 rgb(211, 41, 112), 30px 5px 0 rgb(211, 41, 112),
+        /* row 2 */
+        0 10px 0 rgb(211, 41, 112), 5px 10px 0 rgb(211, 41, 112), 10px 10px 0 rgb(211, 41, 112), 15px 10px 0 rgb(211, 41, 112), 20px 10px 0 rgb(211, 41, 112), 25px 10px 0 rgb(211, 41, 112), 30px 10px 0 rgb(211, 41, 112),
+        /* row 3 */
+        5px 15px 0 rgb(211, 41, 112), 10px 15px 0 rgb(211, 41, 112), 15px 15px 0 rgb(211, 41, 112), 20px 15px 0 rgb(211, 41, 112), 25px 15px 0 rgb(211, 41, 112),
+        /* row 4 */
+        10px 20px 0 rgb(211, 41, 112), 15px 20px 0 rgb(211, 41, 112), 20px 20px 0 rgb(211, 41, 112),
+        /* row 5 - dil ki nok */
+        15px 25px 0 rgb(211, 41, 112);
+    /* kaali outline - chaaron taraf 2px kaala saya, poore dil ki shape ke gird */
+    filter:
+        drop-shadow(2px 0 0 black)
+        drop-shadow(-2px 0 0 black)
+        drop-shadow(0 2px 0 black)
+        drop-shadow(0 -2px 0 black);
+}
 /* neeche wala hissa - teeno dil yahan ek line mein beech mein */
 .mini-body{
     background-color: #fff0f5;
