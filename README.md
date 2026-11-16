@@ -4,7 +4,9 @@
 
 ### 🌐 Try it live → [friendship-mixtape.vercel.app](https://friendship-mixtape.vercel.app)
 
-![design inspiration](doodle.PNG)
+![the mixtape player playing a song for Sara](screenshots/mixtape-player.png)
+
+<p align="center"><img src="screenshots/birthday-message.png" alt="Happy Birthday message with a listen button" width="600"></p>
 
 ---
 
@@ -73,7 +75,9 @@ friendship-mixtape/
 ├── index.html   → the page structure
 ├── style.css    → all the cute styling
 ├── script.js    → names, music and buttons
-└── doodle.PNG   → the design reference
+├── favicon.svg  → the little pink cassette icon in the tab
+├── screenshots/ → pictures for this README
+└── doodle.PNG   → the design reference I started from
 ```
 
 ## 🧠 Things I learned while making this
