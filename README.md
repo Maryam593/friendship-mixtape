@@ -59,12 +59,6 @@ Press **get your card 💿** under the player:
 - It's sized 1080×1350, ready for WhatsApp, Instagram or a story. Your friend taps it and hears their song. 💗
 - Keep the tab open while it records!
 
-## 🚧 Coming soon
-
-- [x] `_ □ x` window buttons that actually work (minimize, maximize, close), and the mini window closes too
-- [x] Looks nice on phones too (responsive)
-- [ ] Star outlines
-
 ## 🎀 How to run
 
 Easiest: open **[friendship-mixtape.vercel.app](https://friendship-mixtape.vercel.app)** 🌐
