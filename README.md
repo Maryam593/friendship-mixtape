@@ -4,7 +4,7 @@
 
 ### 🌐 Try it live → [friendship-mixtape.vercel.app](https://friendship-mixtape.vercel.app)
 
-![the mixtape player playing a song for Sara](screenshots/mixtape-player.png)
+![demo: typing two names, the mixtape playing, and the music card](screenshots/demo.gif)
 
 <p align="center"><img src="screenshots/birthday-message.png" alt="Happy Birthday message with a listen button" width="600"></p>
 
