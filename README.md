@@ -1,4 +1,4 @@
-# 💗 friendship-mixtape
+# 💗 Friendship Mixtape
 
 > A cute, doodle-style birthday mixtape made with plain **HTML + CSS + JS**. Type your name and your friend's name, and the page composes a little song from both names. 🎀
 
